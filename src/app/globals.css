@@ -10,7 +10,7 @@
     --l2-color: #B9E5E8;
     --l3-color: #DFF2EB;
     --gray-color: #adadad;
-    --deep-gray-color: #505050;
+    --deep-gray-color: #354155;
   }
 }
 @layer base {
@@ -84,18 +84,11 @@ body {
   overflow-y: auto;
   color: var(--white-color);
   background: var(--l3-color);
-  /* background: linear-gradient(var(--white-color), var(--white-color) 20%, var(--main-color)); */
   position: relative;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-
-  @media (max-width: 1024px) {
-    padding: 0 2rem;
-  }
-  @media (max-width: 720px) {
-    padding: 0;
-  }
+  /* background: linear-gradient(var(--white-color), var(--white-color) 20%, var(--main-color)); */
 }
 
 /* .swiper-lazy-preloader {

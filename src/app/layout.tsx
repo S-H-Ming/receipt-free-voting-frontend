@@ -4,7 +4,7 @@ import "./globals.css"
 import { ContextProvider } from "@/context"
 import Head from "next/head"
 import Header from "@/components/header"
-// import Footer from "@/components/footer"
+import Footer from "@/components/footer"
 
 export const metadata: Metadata = {
   title: "voting system",
@@ -33,7 +33,7 @@ export default async function RootLayout({
           <main className="relative mb-auto mt-0 flex min-h-full w-full max-w-[1920px] flex-col gap-0 py-0 md:px-16 lg:gap-2 xl:py-2">
             {children}
           </main>
-          {/* <Footer /> */}
+          <Footer />
         </ContextProvider>
       </body>
     </html>

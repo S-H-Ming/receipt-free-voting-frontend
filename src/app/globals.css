@@ -1,0 +1,132 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --white-color: #ffffff;
+    --main-color: #4A628A;
+    --l1-color: #7AB2D3;
+    --l2-color: #B9E5E8;
+    --l3-color: #DFF2EB;
+    --gray-color: #adadad;
+    --deep-gray-color: #354155;
+  }
+}
+@layer base {
+  @font-face {
+    font-family: "Trail";
+    font-weight: 400;
+    font-style: normal;
+    src: url(/fonts/Helvetica.ttf) format("truetype");
+  }
+}
+
+@layer utilities {
+  .text-white-color {
+    color: var(--white-color);
+  }
+  .text-main-color {
+    color: var(--main-color);
+  }
+  .text-l1-color {
+    color: var(--l1-color);
+  }
+  .text-l2-color {
+    color: var(--l2-color);
+  }
+  .text-l3-color {
+    color: var(--l3-color);
+  }
+  .text-gray-color {
+    color: var(--gray-color);
+  }
+  .text-deep-gray-color {
+    color: var(--deep-gray-color);
+  }
+  .text-pearl-color {
+    color: var(--pearl-color);
+  }
+
+  .bg-white-color {
+    background-color: var(--white-color);
+  }
+  .bg-main-color {
+    background-color: var(--main-color);
+  }
+  .bg-l1-color {
+    background-color: var(--l1-color);
+  }
+  .bg-l2-color {
+    background-color: var(--l2-color);
+  }
+  .bg-l3-color {
+    background-color: var(--l3-color);
+  }
+  .bg-gray-color {
+    background-color: var(--gray-color);
+  }
+  .bg-deep-gray-color {
+    background-color: var(--deep-gray-color);
+  }
+  .bg-pearl-color {
+    background-color: var(--pearl-color);
+  }
+}
+
+
+html,
+body {
+  min-height: 100vh;
+}
+
+body {
+  overflow-y: auto;
+  color: var(--white-color);
+  background: var(--l3-color);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  /* background: linear-gradient(var(--white-color), var(--white-color) 20%, var(--main-color)); */
+}
+
+/* .swiper-lazy-preloader {
+  border-color: var(--light-gray-color) !important;
+} */
+
+::-webkit-scrollbar {
+  margin-left: 100px;
+  width: 2px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--black-color);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--deep-gray-color);
+  border-radius: 2px;
+}
+
+.swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.swiper-slide {
+  text-align: center;
+  font-size: 18px;
+
+  /* Center slide text vertically */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.swiper-slide img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

@@ -29,7 +29,7 @@ export default function Button({
       rounded = "rounded-md px-4 py-1 pt-2"
       break
     case "secondary":
-      bgColor = "bg-white disabled:bg-deepgray"
+      bgColor = "bg-l2-color disabled:bg-deepgray"
       textColor = "text-deepgray disabled:text-white"
       rounded = "rounded-2xl px-8 py-1"
       break

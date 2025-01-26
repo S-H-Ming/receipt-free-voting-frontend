@@ -26,6 +26,25 @@ export const ContextProvider = (props: any) => {
   const [acc, setAcc] = useState<AccountInfo | undefined>(undefined)
   const [address, setAddress] = useState<string | undefined>(undefined)
   const [message, setMessage] = useState("")
+  const [currentStep, setCurrentStep] = useState<ContextState["currentStep"]>("connect_wallet");
+  const [googleAccount, setGoogleAccount] = useState<string | undefined>(undefined);
+  const [candidates, setCandidates] = useState<ContextState["candidates"]>([]);
+
+  var cands = [
+    { id: 1, name: "test1", imageURL: "../images/test.jpg" },
+    { id: 2, name: "test2", imageURL: "../images/test.jpg" },
+    { id: 3, name: "test3", imageURL: "../images/test.jpg" },
+    { id: 4, name: "test4", imageURL: "../images/test.jpg" },
+    { id: 5, name: "test5", imageURL: "../images/test.jpg" },
+    { id: 6, name: "test6", imageURL: "../images/test.jpg" },
+    { id: 7, name: "test7", imageURL: "../images/test.jpg" },
+    { id: 8, name: "test8", imageURL: "../images/test.jpg" },
+    { id: 9, name: "test9", imageURL: "../images/test.jpg" },
+    { id: 10, name: "test10", imageURL: "../images/test.jpg" },
+  ];
+  const handleVote = async (id: number) => {
+    alert(`Voted for candidate with ID: ${id}`);
+  };
 
   // Use Ghostnet temporarily
   const initTezosWallet = useCallback(async () => {
@@ -47,6 +66,7 @@ export const ContextProvider = (props: any) => {
 
   const init = useCallback(async () => {
     await initTezosWallet()
+    setCandidates(cands)
     setIsInitLoading(false)
   }, [initTezosWallet])
 
@@ -62,6 +82,14 @@ export const ContextProvider = (props: any) => {
     setAcc(tezos !== null ? await wallet?.client.getActiveAccount() : undefined)
     setAddress((await wallet?.client.getActiveAccount())?.address)
   }
+
+  const setStep = (step: ContextState["currentStep"]) => {
+    setCurrentStep(step);
+  };
+
+  const updateGoogleAccount = (account: string | undefined) => {
+    setGoogleAccount(account);
+  };
 
   const syncTaquito = async () => {
     // We check the storage and only do a permission request if we don't have an active account yet
@@ -80,8 +108,18 @@ export const ContextProvider = (props: any) => {
     }
     // setTezos(tezos)
     // setWallet(wallet)
-    setAddress(await wallet?.getPKH())
-    setAcc(await wallet?.client.getActiveAccount())
+    const userAddress = await wallet?.getPKH();
+    const userAccount = await wallet?.client.getActiveAccount();
+
+    if (userAddress && userAccount) {
+      setAddress(userAddress);
+      setAcc(userAccount);
+
+      // update current step to login_google
+      setCurrentStep("login_google");
+    } else {
+      console.error("Failed to retrieve user account or address.");
+    }
   }
 
   const disconnect = async () => {
@@ -90,6 +128,7 @@ export const ContextProvider = (props: any) => {
     await wallet!.client.clearActiveAccount()
     setAddress(undefined)
     setAcc(undefined)
+    setCurrentStep("connect_wallet")
   }
 
   const checkOpStatus = async (tzktEvents: EventsService, opHash: string, contract: string) => {
@@ -123,6 +162,34 @@ export const ContextProvider = (props: any) => {
       }
     }
   }
+
+  return (
+    <Context.Provider
+      value={{
+        isInitLoading,
+        gateways: gateways ?? {},
+        tezos,
+        wallet,
+        acc,
+        address,
+        message,
+        currentStep,
+        googleAccount,
+        candidates,
+        setStep,
+        setGoogleAccount: updateGoogleAccount,
+        updateMessage,
+        setAccount,
+        syncTaquito,
+        disconnect,
+        handleVote
+      }}
+    >
+  {props.children}
+</Context.Provider>
+
+  )
+}
 
   /*
   const createGacha = async (
@@ -300,23 +367,3 @@ export const ContextProvider = (props: any) => {
     return res
   }
   */
-  return (
-    <Context.Provider
-      value={{
-        isInitLoading,
-        gateways: gateways ?? {},
-        tezos,
-        wallet,
-        acc,
-        address,
-        message,
-        updateMessage,
-        setAccount,
-        syncTaquito,
-        disconnect
-      }}
-    >
-      {props.children}
-    </Context.Provider>
-  )
-}

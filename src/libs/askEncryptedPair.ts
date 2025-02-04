@@ -20,6 +20,20 @@ function EncryptedPairs () {
     }, []);
 
     // UI
-}; 
+    return (
+        <div>
+            <h1>Encrypted Pairs</h1>
+            {error ? (
+                <p>{error}</p>
+            ) : (
+                <ul>
+                    {encryptedPairs.map((pair, index) => (
+                        <li key={index}>{`( ${pair[0]}, ${pair[1]} )`}</li>
+                    ))}
+                </ul>
+            )}
+        </div>
+    );
+} 
 
 export default EncryptedPairs;

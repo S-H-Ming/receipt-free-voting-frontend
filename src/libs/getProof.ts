@@ -24,6 +24,25 @@ function GetProof() {
     }, []);
 
     //UI
+    return (
+        <div>
+            <h1>Proof</h1>
+            {error ? (
+                <p>{error}</p>
+            ): (
+                <div>
+                    <p>Seed: {seed}</p>
+                    <ul>
+                        {proof.map((pair, index) => (
+                            <li key={index}>
+                                {`[(${pair[0][0]}, ${pair[0][1]}), (${pair[1][0]}, ${pair[1][1]})]`}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+        </div>
+    );
 }
 
 export default GetProof;

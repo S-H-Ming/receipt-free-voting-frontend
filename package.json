@@ -47,7 +47,6 @@
     "typescript": "^5"
   },
   "overrides": {
-    "@parcel/watcher": "~2.1.0",
-    "solid-js": "0.0.0"
+    "@parcel/watcher": "~2.1.0"
   }
 }

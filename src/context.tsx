@@ -5,19 +5,13 @@ import { type BeaconWallet } from "@taquito/beacon-wallet"
 import { MichelsonMap, OpKind, WalletParamsWithKind, type TezosToolkit } from "@taquito/taquito"
 import { type AccountInfo } from "@airgap/beacon-types"
 import { NetworkType } from "@airgap/beacon-types";
-
-// import {
-//   NETWORK_TYPE,
-//   NODE_URL,
-//   TZAPEX_GACHA_ADDR,
-//   TZKT_API_URL,
-//   APEX_TOKEN_ADDR
-// } from "@/enviroment"
+import {
+  CANDIDATES
+} from "@/environment"
 import { EventsService } from "@tzkt/sdk-events"
-import { ContextState } from "@/interfaces/context.interface"
+import { ContextState, Candidate } from "@/interfaces/context.interface"
 
 export const Context = createContext<ContextState>(null!)
-
 export const ContextProvider = (props: any) => {
   const [isInitLoading, setIsInitLoading] = useState<boolean>(true)
   const [gateways, setGateways] = useState<{ [key: string]: string } | null>(null)
@@ -30,20 +24,26 @@ export const ContextProvider = (props: any) => {
   const [googleAccount, setGoogleAccount] = useState<string | undefined>(undefined);
   const [candidates, setCandidates] = useState<ContextState["candidates"]>([]);
 
-  var cands = [
-    { id: 1, name: "test1", imageURL: "../images/test.jpg" },
-    { id: 2, name: "test2", imageURL: "../images/test.jpg" },
-    { id: 3, name: "test3", imageURL: "../images/test.jpg" },
-    { id: 4, name: "test4", imageURL: "../images/test.jpg" },
-    { id: 5, name: "test5", imageURL: "../images/test.jpg" },
-    { id: 6, name: "test6", imageURL: "../images/test.jpg" },
-    { id: 7, name: "test7", imageURL: "../images/test.jpg" },
-    { id: 8, name: "test8", imageURL: "../images/test.jpg" },
-    { id: 9, name: "test9", imageURL: "../images/test.jpg" },
-    { id: 10, name: "test10", imageURL: "../images/test.jpg" },
-  ];
-  const handleVote = async (id: number) => {
-    alert(`Voted for candidate with ID: ${id}`);
+  const handleVote = async (candidate: Candidate) => {
+
+    if (!tezos) {
+      console.error("Tezos toolkit is not initialized.");
+      alert("Please connect your wallet before voting.");
+      return;
+    }
+    try {
+      const contract = await tezos.wallet.at(candidate.address!);
+      const op = await contract.methodsObject.vote({
+        ballot_sig: 0,
+        mask_inv: 0,
+        mask: 0,      
+        v: 0     
+      }).send();
+      await op.confirmation();
+      alert(`Voted successfully! Operation hash : ${op.opHash}`);
+    } catch (error) {
+      console.error("Error while voting : ", error);
+    }
   };
 
   // Use Ghostnet temporarily
@@ -51,7 +51,7 @@ export const ContextProvider = (props: any) => {
     if (tezos === null || wallet === null) {
       const _tezos = new (await import("@taquito/taquito")).TezosToolkit("https://ghostnet.ecadinfra.com")
       const _wallet = new (await import("@taquito/beacon-wallet")).BeaconWallet({
-        name: "TZAPEX",
+        name: "VOTING_APP",
         network: { 
             type: NetworkType.GHOSTNET, // 
             rpcUrl: "https://ghostnet.ecadinfra.com", },
@@ -66,7 +66,7 @@ export const ContextProvider = (props: any) => {
 
   const init = useCallback(async () => {
     await initTezosWallet()
-    setCandidates(cands)
+    setCandidates(CANDIDATES)
     setIsInitLoading(false)
   }, [initTezosWallet])
 
@@ -129,38 +129,6 @@ export const ContextProvider = (props: any) => {
     setAddress(undefined)
     setAcc(undefined)
     setCurrentStep("connect_wallet")
-  }
-
-  const checkOpStatus = async (tzktEvents: EventsService, opHash: string, contract: string) => {
-    console.log("Hash : " + opHash)
-
-    const tx = await new Promise((resolve) => {
-      tzktEvents
-        .operations({
-          types: ["transaction"],
-          address: contract
-        })
-        .subscribe({
-          next: (tx: any) => {
-            if (tx.data.hash === opHash) {
-              resolve(tx)
-            }
-          }
-        })
-      setTimeout(() => resolve(null), 60000)
-    })
-
-    if (tx === null) {
-      return {
-        status: "failed",
-        opHash: opHash
-      }
-    } else {
-      return {
-        status: "success",
-        opHash: opHash
-      }
-    }
   }
 
   return (

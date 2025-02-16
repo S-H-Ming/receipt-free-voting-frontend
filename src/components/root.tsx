@@ -31,18 +31,21 @@ export default function Root() {
         );
       case "voting":
         return (
-          <Button
-            type="primary"
-            onClick={() => {
-              // simulate voting sucess
-              context.setStep("voting_success");
-            }}
-          >
-            Voting Completed
-          </Button>
+          <div>
+            <p className="text-1xl font-bold text-l1-color pb-4">Your Google Account : {context.googleAccount}</p>
+            <Button
+              type="primary"
+              onClick={() => {
+                // simulate voting sucess
+                context.setStep("voting_success");
+              }}
+            >
+              Voting Completed
+            </Button>
+          </div>
         );
       case "voting_success":
-        return <div className="text-white">Voting Success! 🎉</div>;
+        return <p className="text-2xl font-bold text-l1-color">Voting Success !</p>;
       default:
         return null;
     }

@@ -4,12 +4,12 @@ import React, { useContext, useEffect, useState } from "react"
 import Button from "@/components/button";
 import { Context } from "@/context";
 
-interface VotingCardProps {
-    id : number;
-    imageURL: string; // 圖片的 URL
-    name: string; // 候選人的名稱
-    onVote: () => void; // 投票按鈕的回調函數
-  }
+export interface VotingCardProps {
+  id : number;
+  imageURL: string; // 圖片的 URL
+  name: string; // 候選人的名稱
+  onVote: () => void;
+}
 
 // Candidate Card Component
 const VotingCard = ({ id, imageURL, name, onVote} : VotingCardProps) => {
@@ -46,7 +46,7 @@ const VotingRoot = () => {
             id={candidate.id}
             imageURL={candidate.imageURL}
             name={candidate.name}
-            onVote={() => handleVote(candidate.id)}
+            onVote={() => handleVote(candidate)}
           />
         ))}
       </div>

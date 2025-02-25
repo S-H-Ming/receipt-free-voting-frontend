@@ -37,7 +37,7 @@ export default function Root() {
               type="primary"
               onClick={() => {
                 // simulate voting sucess
-                context.setStep("voting_success");
+                context.handleVote();
               }}
             >
               Voting Completed

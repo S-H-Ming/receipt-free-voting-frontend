@@ -7,6 +7,7 @@ export interface Candidate {
   imageURL: string;
   name: string;
   address?: string;
+  checked: boolean;
 }
 
 export interface ContextState {
@@ -26,7 +27,8 @@ export interface ContextState {
   setAccount: () => Promise<void>
   syncTaquito: () => Promise<void>
   disconnect: () => Promise<void>
-  handleVote: (candidate: Candidate) => Promise<void>
+  handleVote: () => Promise<void>
+  updateVote: (id: number, checked: boolean) => void
   /**
    *
    * @param tokenList Gacha token list in a round. Each token will be an object consisting of fa2, id and amount.

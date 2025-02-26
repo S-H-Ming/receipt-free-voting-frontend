@@ -2,6 +2,14 @@ import { AccountInfo } from "@airgap/beacon-types"
 import { BeaconWallet } from "@taquito/beacon-wallet"
 import { TezosToolkit } from "@taquito/taquito"
 
+export interface Candidate {
+  id : number;
+  imageURL: string;
+  name: string;
+  address?: string;
+  checked: boolean;
+}
+
 export interface ContextState {
   isInitLoading: boolean
   gateways: { [key: string]: string }
@@ -12,14 +20,15 @@ export interface ContextState {
   message: string
   currentStep: "connect_wallet" | "login_google" | "voting" | "voting_success" | "tally_pending" | "tally_completed"
   googleAccount: string | undefined
-  candidates: { id: number; name: string; imageURL: string; }[]
+  candidates: Candidate[]
   setStep: (step: ContextState["currentStep"]) => void
   setGoogleAccount: (account: string | undefined) => void
   updateMessage: (message: string) => void
   setAccount: () => Promise<void>
   syncTaquito: () => Promise<void>
   disconnect: () => Promise<void>
-  handleVote: (candidateId: number) => Promise<void>
+  handleVote: () => Promise<void>
+  updateVote: (id: number, checked: boolean) => void
   /**
    *
    * @param tokenList Gacha token list in a round. Each token will be an object consisting of fa2, id and amount.

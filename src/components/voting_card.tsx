@@ -2,14 +2,15 @@
 
 import React, { useContext, useEffect, useState } from "react"
 import Button from "@/components/button";
+import Toggle from "@/components/toggle";
 import { Context } from "@/context";
 
-interface VotingCardProps {
-    id : number;
-    imageURL: string; // 圖片的 URL
-    name: string; // 候選人的名稱
-    onVote: () => void; // 投票按鈕的回調函數
-  }
+export interface VotingCardProps {
+  id : number;
+  imageURL: string; // 圖片的 URL
+  name: string; // 候選人的名稱
+  onVote: (checked: boolean) => void;
+}
 
 // Candidate Card Component
 const VotingCard = ({ id, imageURL, name, onVote} : VotingCardProps) => {
@@ -26,19 +27,21 @@ const VotingCard = ({ id, imageURL, name, onVote} : VotingCardProps) => {
         <h3 className="text-lg font-medium mt-2 mb-4 text-center text-l1-color">{name}</h3>
   
         {/* Vote Button */}
-        <Button
+        {/* <Button
           type = "secondary"
           onClick={onVote}
         >
           Vote
-        </Button>
+        </Button> */}
+        <Toggle checked={false} onChange={(value) => {onVote(value)}} />
+        
       </div>
     );
   };
   
   // Candidate Root Component
 const VotingRoot = () => {
-    const {candidates, handleVote} = useContext(Context);
+    const {candidates, handleVote, updateVote} = useContext(Context);
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-12">
         {candidates.map((candidate) => (
@@ -46,7 +49,7 @@ const VotingRoot = () => {
             id={candidate.id}
             imageURL={candidate.imageURL}
             name={candidate.name}
-            onVote={() => handleVote(candidate.id)}
+            onVote={(value) => updateVote(candidate.id, value)}
           />
         ))}
       </div>

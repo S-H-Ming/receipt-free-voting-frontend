@@ -1,9 +1,16 @@
-import { AccountInfo } from "@airgap/beacon-types"
-import { BeaconWallet } from "@taquito/beacon-wallet"
-import { TezosToolkit } from "@taquito/taquito"
+import { AccountInfo } from "@airgap/beacon-types";
+import { BeaconWallet } from "@taquito/beacon-wallet";
+import { TezosToolkit } from "@taquito/taquito";
+
+export enum VotingStep {
+  CONNECT_WALLET = "connect_wallet",
+  LOGIN_GOOGLE = "login_google",
+  VOTING = "voting",
+  VOTING_SUCCESS = "voting_success",
+}
 
 export interface Candidate {
-  id : number;
+  id: number;
   imageURL: string;
   name: string;
   address?: string;
@@ -11,24 +18,30 @@ export interface Candidate {
 }
 
 export interface ContextState {
-  isInitLoading: boolean
-  gateways: { [key: string]: string }
-  tezos: TezosToolkit | null
-  wallet: BeaconWallet | null
-  acc?: AccountInfo
-  address?: string
-  message: string
-  currentStep: "connect_wallet" | "login_google" | "voting" | "voting_success" | "tally_pending" | "tally_completed"
-  googleAccount: string | undefined
-  candidates: Candidate[]
-  setStep: (step: ContextState["currentStep"]) => void
-  setGoogleAccount: (account: string | undefined) => void
-  updateMessage: (message: string) => void
-  setAccount: () => Promise<void>
-  syncTaquito: () => Promise<void>
-  disconnect: () => Promise<void>
-  handleVote: () => Promise<void>
-  updateVote: (id: number, checked: boolean) => void
+  isInitLoading: boolean;
+  gateways: { [key: string]: string };
+  tezos: TezosToolkit | null;
+  wallet: BeaconWallet | null;
+  acc?: AccountInfo;
+  address?: string;
+  message: string;
+  currentStep:
+    | "connect_wallet"
+    | "login_google"
+    | "voting"
+    | "voting_success"
+    | "tally_pending"
+    | "tally_completed";
+  googleAccount: string | undefined;
+  candidates: Candidate[];
+  setStep: (step: ContextState["currentStep"]) => void;
+  setGoogleAccount: (account: string | undefined) => void;
+  updateMessage: (message: string) => void;
+  setAccount: () => Promise<void>;
+  syncTaquito: () => Promise<void>;
+  disconnect: () => Promise<void>;
+  handleVote: () => Promise<void>;
+  updateVote: (id: number, checked: boolean) => void;
   /**
    *
    * @param tokenList Gacha token list in a round. Each token will be an object consisting of fa2, id and amount.

@@ -1,7 +1,9 @@
-const API_URL = "https://127.0.0.1:8000";
+import { API_URL } from "../constants";
 
 // Fetch results from the API
-export const setResult = async (data: { [key: number]: number }): Promise<void> => {
+export const setResult = async (data: {
+  [key: number]: number;
+}): Promise<void> => {
   try {
     const response = await fetch(`${API_URL}/VA/set_result`, {
       method: "POST",

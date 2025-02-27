@@ -3,7 +3,7 @@
 import React, { useContext } from "react";
 import { Context } from "@/context";
 import Button from "./button";
-import VotingRoot from "./voting_card";
+import VotingRoot from "./voting";
 import { VotingStep } from "@/interfaces/context.interface";
 
 export default function Root() {

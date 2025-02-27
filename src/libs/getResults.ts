@@ -1,6 +1,5 @@
 import { ResultResponse } from "../interfaces/apiTypes";
-
-const API_URL = "https://127.0.0.1:8000";
+import { API_URL } from "../constants";
 
 // Fetch results from the API
 export const getResults = async (): Promise<ResultResponse> => {

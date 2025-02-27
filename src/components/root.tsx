@@ -7,7 +7,7 @@ import VotingRoot from "./voting";
 import { VotingStep } from "@/interfaces/context.interface";
 
 export default function Root() {
-  const { currentStep, setStep, googleAccount, handleVote, setGoogleAccount } =
+  const { currentStep, setStep, googleAccount, handleVote } =
     useContext(Context);
 
   const renderButton = () => {
@@ -25,7 +25,7 @@ export default function Root() {
             // temporary solution
             onClick={() => {
               setStep(VotingStep.VOTING);
-              setGoogleAccount("user@gmail.com");
+              // setGoogleAccount("user@gmail.com");
             }}
           >
             Login Google

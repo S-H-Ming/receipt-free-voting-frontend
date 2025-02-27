@@ -35,7 +35,8 @@ export interface ContextState {
   googleAccount: string | undefined;
   candidates: Candidate[];
   setStep: (step: ContextState["currentStep"]) => void;
-  setGoogleAccount: (account: string | undefined) => void;
+  signInGoogle: (callbackUrl: string) => Promise<boolean>;
+  signOutGoogle: () => Promise<void>;
   updateMessage: (message: string) => void;
   setAccount: () => Promise<void>;
   syncTaquito: () => Promise<void>;

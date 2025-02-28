@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import axios from 'axios';
 import { API_URL } from '../constants';
-import { commitment } from '../interfaces/objects';
+import { commitment } from '../interfaces/context.interface';
 
 function GetCommitment() {
     let commitment: commitment | undefined;

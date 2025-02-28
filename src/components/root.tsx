@@ -5,9 +5,11 @@ import { Context } from "@/context";
 import Button from "./button";
 import VotingRoot from "./voting";
 import { VotingStep } from "@/interfaces/context.interface";
+import Validation from "./validation";
+import { useSession } from "next-auth/react";
 
 export default function Root() {
-  const { currentStep, setStep, googleAccount, handleVote, setGoogleAccount } =
+  const { currentStep, setStep, signInGoogle } =
     useContext(Context);
 
   const renderButton = () => {
@@ -22,22 +24,16 @@ export default function Root() {
         return (
           <Button
             type="primary"
-            // temporary solution
             onClick={() => {
-              setStep(VotingStep.VOTING);
-              setGoogleAccount("user@gmail.com");
+              
+                signInGoogle().then((isSuccess) => {
+                  if (isSuccess) {
+                    setStep(VotingStep.VOTING);
+                  }
+                });
             }}
-          >
-            Login Google
+          >Login Google
           </Button>
-        );
-      case VotingStep.VOTING:
-        return (
-          <div>
-            <p className="text-1xl font-bold text-l1-color pb-4">
-              Your Google Account : {googleAccount}
-            </p>
-          </div>
         );
       case VotingStep.VOTING_SUCCESS:
         return (
@@ -50,6 +46,7 @@ export default function Root() {
 
   return (
     <div className="w-full">
+      <Validation />
       {renderButton()}
       {currentStep === VotingStep.VOTING && <VotingRoot />}
     </div>

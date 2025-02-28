@@ -1,39 +1,25 @@
 import React, {useEffect, useState} from 'react';
 import axios from 'axios';
+import { API_URL } from '../constants';
+import { encrypted_pairs } from '../interfaces/context.interface'
 
 function EncryptedPairs () {
-    const [encryptedPairs, setEncryptedPairs] = useState<[number, number][]>([]);
-    const [error, setError] = useState<string | null>(null);
-
-    useEffect( () => {
-        const askEncryptedPairs = async () => {
-            try {
-                const response = await axios.get('https://127.0.0.1:8000/VA/get_pairs');
-                setEncryptedPairs(response.data.encrypted_pairs); //http ok 200
-            } catch (error) {
-                if (axios.isAxiosError(error)) {
-                    setError(error.message); //http bad request 400
-                }
-            }
+    let encrypted_pairs: encrypted_pairs = {
+        encrypted_pairs: [[[0, 0], [0, 0]]]
     };
-    askEncryptedPairs();
-    }, []);
 
-    // UI
-    return (
-        <div>
-            <h1>Encrypted Pairs</h1>
-            {error ? (
-                <p>{error}</p>
-            ) : (
-                <ul>
-                    {encryptedPairs.map((pair, index) => (
-                        <li key={index}>{`( ${pair[0]}, ${pair[1]} )`}</li>
-                    ))}
-                </ul>
-            )}
-        </div>
-    );
+    const askEncryptedPairs = async () => {
+        try {
+            const response = await axios.get(`${API_URL}/VA/get_pairs`);
+            if (response.status === 200) {
+                encrypted_pairs = response. data;
+            }
+        } catch (error) {
+            console.error('Error fetching encrypted pairs:', error);
+        }
+    };
+    return encrypted_pairs;
+    
 } 
 
 export default EncryptedPairs;

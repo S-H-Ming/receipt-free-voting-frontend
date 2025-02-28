@@ -17,6 +17,10 @@ export const WalletConnect = () => {
     }
   }
 
+  useEffect(() => {
+    context.setAccount()
+  }, [context])
+
   const handleUnsync = async () => {
     await context.disconnect()
     setShowDisconnect(false) // Close the dropdown after disconnecting

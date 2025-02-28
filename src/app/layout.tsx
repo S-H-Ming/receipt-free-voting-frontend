@@ -7,7 +7,7 @@ import Header from "@/components/header"
 import Footer from "@/components/footer"
 
 export const metadata: Metadata = {
-  title: "voting system",
+  title: "Blockchain Voter",
   description: ""
 }
 

@@ -28,9 +28,7 @@ export const ContextProvider = (props: any) => {
   const [message, setMessage] = useState("");
   const [currentStep, setCurrentStep] =
     useState<ContextState["currentStep"]>("connect_wallet");
-  const [googleAccount, setGoogleAccount] = useState<string | undefined>(
-    undefined
-  );
+
   const [candidates, setCandidates] = useState<ContextState["candidates"]>([]);
 
   /* 
@@ -116,6 +114,8 @@ export const ContextProvider = (props: any) => {
       const _tezos = new (await import("@taquito/taquito")).TezosToolkit(
         "https://ghostnet.ecadinfra.com"
       );
+
+
       const _wallet = new (await import("@taquito/beacon-wallet")).BeaconWallet(
         {
           name: "VOTING_APP",
@@ -126,6 +126,16 @@ export const ContextProvider = (props: any) => {
           featuredWallets: ["temple", "kukai", "metamask", "tzsafe"],
         }
       );
+
+    //   try {
+    //     await _wallet.requestPermissions({
+    //         network: {
+    //             type: NetworkType.GHOSTNET,
+    //         }
+    //     });
+    // } catch (error) {
+    //     console.error("Wallet connection failed:", error);
+    // }
 
       _tezos?.setWalletProvider(_wallet);
       setWallet(_wallet);
@@ -158,9 +168,9 @@ export const ContextProvider = (props: any) => {
     setCurrentStep(step);
   };
 
-  const updateGoogleAccount = (account: string | undefined) => {
-    setGoogleAccount(account);
-  };
+  // const updateGoogleAccount = (account: string | undefined) => {
+  //   setGoogleAccount(account);
+  // };
 
   const syncTaquito = async () => {
     // We check the storage and only do a permission request if we don't have an active account yet
@@ -235,10 +245,8 @@ export const ContextProvider = (props: any) => {
         address,
         message,
         currentStep,
-        googleAccount,
         candidates,
         setStep,
-        // setGoogleAccount: updateGoogleAccount,
         signInGoogle,
         signOutGoogle,
         updateMessage,

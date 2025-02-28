@@ -17,6 +17,35 @@ export interface Candidate {
   checked: boolean;
 }
 
+export interface commitment {
+  commitment: string;
+  seed: number;
+  proof: [[number, number], [number, number]] [];
+}
+
+export interface proof {
+  seed: number;
+  proof: [[number, number], [number, number]] [];
+}
+
+export interface encrypted_pairs {
+  encrypted_pairs: [[number, number], [number, number]] [];
+}
+
+export interface Ballot {
+  mask: string;
+  mask_inv: string;
+}
+
+export interface register_voter {
+  email: string;
+  ballot: Ballot;
+}
+
+export interface register_response {
+  sign_ballot: [number, number];
+}
+
 export interface ContextState {
   isInitLoading: boolean;
   gateways: { [key: string]: string };

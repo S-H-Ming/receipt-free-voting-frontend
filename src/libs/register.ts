@@ -1,11 +1,19 @@
 import axios from 'axios';
 import { API_URL } from '../constants';
-import { Ballot, register_response, register_voter } from '../interfaces/context.interface';
+import { Ballot, register_response } from '../interfaces/context.interface';
+import { useSession } from 'next-auth/react';
 
-async function register(email: string, ballot: Ballot): Promise<register_response> {
+
+async function register(ballot: Ballot): Promise<register_response> {
+    const { data: session } = useSession();
+
+    if (!session?.user?.identifier) {
+        throw new Error("User not authenticated");
+    }
+
     try {
         const response = await axios.post<register_response>(`${API_URL}/ia/`, {
-            email: email,
+            email: session.user.identifier,
             ballot: ballot,
         });
 

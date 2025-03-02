@@ -7,3 +7,5 @@ export const CANDIDATES: Candidate[] = [
     { id: 4, name: "test4", imageURL: "/images/test.jpg", address: "KT1LtgMnfBfS4SkLsQLsDGrtVxHUouUsApyS" },
     { id: 5, name: "test5", imageURL: "/images/test.jpg", address: "KT1CKziJciRoXUe36a4SMyMs2w368QPEqPNf" }
   ].map(candidate => ({ ...candidate, checked: false }));
+
+export const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL

@@ -1,10 +1,10 @@
 import { ResultResponse } from "../interfaces/apiTypes";
-import { API_URL } from "../constants";
+import { BACKEND_URL } from "@/environment";
 
 // Fetch results from the API
 export const getResults = async (): Promise<ResultResponse> => {
   try {
-    const response = await fetch(`${API_URL}/VA/get_results`, {
+    const response = await fetch(`${BACKEND_URL}/VA/get_results`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     });

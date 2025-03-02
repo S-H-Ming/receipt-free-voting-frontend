@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { Ballot } from "@/interfaces/context.interface";
 
 // Utility Functions
 function extendedGcd(a: bigint, b: bigint): [bigint, bigint, bigint] {
@@ -27,11 +28,6 @@ function fastModExp(base: bigint, exp: bigint, mod: bigint): bigint {
 // Type Definitions
 type HashFunction = (input: Uint8Array) => Uint8Array;
 type HashType = "sha256" | "sha512";
-
-interface MaskedBallot {
-    b1: bigint;
-    b2: bigint;
-}
 
 export class Voter {
     private choiceLength: number;
@@ -78,7 +74,7 @@ export class Voter {
         return b === BigInt(0) ? a : this.gcd(b, a % b);
     }
 
-    public generateBallot(rsaN: bigint, rsaV: bigint, hash: HashType | HashFunction = "sha256"): MaskedBallot {
+    public generateBallot(rsaN: bigint, rsaV: bigint, hash: HashType | HashFunction = "sha256"): Ballot {
         if (!this.encPairs) throw new Error("No encrypted pairs received.");
         if (!this.mask || !this.maskInv) this.generateMask(rsaN);
 

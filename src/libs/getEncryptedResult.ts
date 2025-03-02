@@ -1,11 +1,11 @@
-import { API_URL } from "@/constants";
+import { BACKEND_URL } from "@/environment";
 import { EncryptedResultResponse } from "../interfaces/apiTypes";
 
 // Fetch results from the API
 export const getEncryptedResult =
   async (): Promise<EncryptedResultResponse> => {
     try {
-      const response = await fetch(`${API_URL}/VA/get_encryptedresult`, {
+      const response = await fetch(`${BACKEND_URL}/VA/get_encryptedresult`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });

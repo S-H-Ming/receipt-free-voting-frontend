@@ -9,6 +9,14 @@ export enum VotingStep {
   VOTING_SUCCESS = "voting_success",
 }
 
+export interface ResultResponse {
+  result: "yes" | "no";
+}
+
+export interface EncryptedResultResponse {
+  eresult: number;
+}  
+
 export interface Candidate {
   id: number;
   imageURL: string;
@@ -17,19 +25,23 @@ export interface Candidate {
   checked: boolean;
 }
 
-export interface commitment {
+export interface Commitment {
   commitment: string;
   seed: number;
   proof: [[number, number], [number, number]] [];
 }
 
-export interface proof {
+export interface Proof {
   seed: number;
   proof: [[number, number], [number, number]] [];
 }
 
-export interface encrypted_pairs {
-  encrypted_pairs: [bigint, bigint][];
+// export interface encrypted_pairs {
+//   encrypted_pairs: [bigint, bigint][];
+// }
+
+export interface EncryptedPairs {
+  [key: string]: [bigint, bigint][]; // Key is a string, value is an array of tuples
 }
 
 export interface Ballot {

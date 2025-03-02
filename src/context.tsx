@@ -14,6 +14,7 @@ import { CANDIDATES } from "@/environment";
 import { EventsService } from "@tzkt/sdk-events";
 import { ContextState, Candidate } from "@/interfaces/context.interface";
 import * as nextAuth from "next-auth/react";
+import * as backendApis from "@/libs/backend_apis";
 
 export const Context = createContext<ContextState>(null!);
 export const ContextProvider = (props: any) => {
@@ -153,6 +154,10 @@ export const ContextProvider = (props: any) => {
     if (isInitLoading) {
       init();
     }
+    //tmp
+    // backendApis.askEncryptedPairs().then((data) => {
+    //   console.log(data);
+    // });
   }, [isInitLoading, init]);
 
   const updateMessage = (message: string) => setMessage(message);

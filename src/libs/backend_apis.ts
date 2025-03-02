@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { BACKEND_URL } from '@/environment';
-import { EncryptedPairs, Commitment, Ballot, Proof, ResultResponse, EncryptedResultResponse } from '@/interfaces/context.interface';
+import { EncryptedPairs, Commitment, Ballot, Proof, ResultResponse, EncryptedResultResponse, RegisterResponse } from '@/interfaces/context.interface';
 import { useSession } from 'next-auth/react';
 
 // === 乙馨 ===
@@ -35,21 +35,23 @@ export const register = async (ballot: Ballot): Promise<Ballot> => {
     }
 
     try {
-        const response = await axios.post<Ballot>(`${BACKEND_URL}/ia/`, {
+        const ballotTuple: [bigint, bigint] = [ballot.b1, ballot.b2];
+        const response = await axios.post<RegisterResponse>(`${BACKEND_URL}/ia/register`, {
             email: session.user.identifier,
-            ballot: ballot,
+            ballot: ballotTuple, 
         });
 
         if (response.status === 200) {
-            return response.data;
+            const [b1, b2] = response.data.sign_ballot;
+            return {b1: BigInt(b1), b2: BigInt(b2) };
         } else {
             throw new Error(`Unexpected response status: ${response.status}`);
         }
     } catch (error) {
         console.error("Registration error:", error);
-        throw error; 
+        throw error;
     }
-}
+};
 
 // === 子芹 ===
 

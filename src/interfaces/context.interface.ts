@@ -41,7 +41,7 @@ export interface Proof {
 // }
 
 export interface EncryptedPairs {
-  [key: string]: [bigint, bigint][]; // Key is a string, value is an array of tuples
+  [key: string]: [bigint, bigint][];
 }
 
 export interface Ballot {
@@ -53,9 +53,9 @@ export interface register_voter {
   ballot: Ballot;
 }
 
-// export interface register_response {
-//   sign_ballot: [number, number];
-// }
+export interface RegisterResponse {
+  sign_ballot: [number, number];
+}
 
 export interface ContextState {
   isInitLoading: boolean;

@@ -1,6 +1,10 @@
-import { ResultResponse } from "../interfaces/apiTypes";
+// interface (放到context.interface.ts)
+export interface ResultResponse {
+  [key: string]: [number, number];
+}
 
-const API_URL = "https://127.0.0.1:8000";
+import { ResultResponse } from '@/interfaces/context.interface';
+const API_URL = "https://blockchain-vote.imlab.app/backend";
 
 // Fetch results from the API
 export const getResults = async (): Promise<ResultResponse> => {
@@ -21,3 +25,4 @@ export const getResults = async (): Promise<ResultResponse> => {
     throw error;
   }
 };
+

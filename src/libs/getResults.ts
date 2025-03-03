@@ -1,9 +1,5 @@
-// interface (放到context.interface.ts)
-export interface ResultResponse {
-  [key: string]: [number, number];
-}
-
 import { ResultResponse } from '@/interfaces/context.interface';
+
 const API_URL = "https://blockchain-vote.imlab.app/backend";
 
 // Fetch results from the API

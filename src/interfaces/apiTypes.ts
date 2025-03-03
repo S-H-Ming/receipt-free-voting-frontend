@@ -1,13 +1,20 @@
-// 定義interfaces
 export interface ResultResponse {
-    result: "yes" | "no";
+    [key: string]: [number, number];
 }
   
 export interface Candidate {
+    id: number;
+    imageURL: string;
     name: string;
-    image_data: string; // Base64 encoded image
+    address?: string;
+    checked: boolean;
+    mask?: bigint;
+    mask_inv?: bigint;
+    ballot?: [bigint, bigint];
+    ballot_sig?: [bigint, bigint];
+    description?: string;
 }
   
-export interface EncryptedResultResponse {
-    eresult: number;
-}  
+// export interface EncryptedResultResponse {
+//     eresult: number;
+// }  

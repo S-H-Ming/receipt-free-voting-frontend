@@ -9,8 +9,7 @@ import Validation from "./validation";
 import { useSession } from "next-auth/react";
 
 export default function Root() {
-  const { currentStep, setStep, signInGoogle } =
-    useContext(Context);
+  const { currentStep } = useContext(Context);
 
   const renderButton = () => {
     switch (currentStep) {
@@ -19,21 +18,6 @@ export default function Root() {
           <p className="text-2xl font-bold text-l1-color">
             Please Connect Your Wallet First.
           </p>
-        );
-      case VotingStep.LOGIN_GOOGLE:
-        return (
-          <Button
-            type="primary"
-            onClick={() => {
-              
-                signInGoogle().then((isSuccess) => {
-                  if (isSuccess) {
-                    setStep(VotingStep.VOTING);
-                  }
-                });
-            }}
-          >Login Google
-          </Button>
         );
       case VotingStep.VOTING_SUCCESS:
         return (

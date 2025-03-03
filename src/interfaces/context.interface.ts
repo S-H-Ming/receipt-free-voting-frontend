@@ -7,6 +7,8 @@ export enum VotingStep {
   LOGIN_GOOGLE = "login_google",
   VOTING = "voting",
   VOTING_SUCCESS = "voting_success",
+  TALLY_PENDING = "tally_pending",
+  TALLY_COMPLETED = "tally_completed",
 }
 
 export interface ResultResponse {
@@ -15,7 +17,7 @@ export interface ResultResponse {
 
 export interface EncryptedResultResponse {
   eresult: number;
-}  
+}
 
 export interface Candidate {
   id: number;
@@ -32,12 +34,12 @@ export interface Candidate {
 export interface Commitment {
   commitment: string;
   seed: number;
-  proof: [[number, number], [number, number]] [];
+  proof: [[number, number], [number, number]][];
 }
 
 export interface Proof {
   seed: number;
-  proof: [[number, number], [number, number]] [];
+  proof: [[number, number], [number, number]][];
 }
 
 // export interface encrypted_pairs {
@@ -49,7 +51,8 @@ export interface EncryptedPairs {
 }
 
 export interface Ballot {
-  b1: bigint; b2: bigint;
+  b1: bigint;
+  b2: bigint;
 }
 
 export interface register_voter {
@@ -69,13 +72,7 @@ export interface ContextState {
   acc?: AccountInfo;
   address?: string;
   message: string;
-  currentStep:
-    | "connect_wallet"
-    | "login_google"
-    | "voting"
-    | "voting_success"
-    | "tally_pending"
-    | "tally_completed";
+  currentStep: VotingStep;
   candidates: Candidate[];
   setStep: (step: ContextState["currentStep"]) => void;
   signInGoogle: (callbackUrl?: string) => Promise<boolean>;

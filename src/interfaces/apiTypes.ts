@@ -1,13 +1,14 @@
 // 定義interfaces
 export interface ResultResponse {
-    result: "yes" | "no";
+  result: "yes" | "no";
 }
-  
+
 export interface Candidate {
-    name: string;
-    image_data: string; // Base64 encoded image
+  names: string;
+  img: string; // Base64 encoded image
+  description: string;
 }
-  
+
 export interface EncryptedResultResponse {
-    eresult: number;
-}  
+  eresult: number;
+}

@@ -53,11 +53,23 @@ export const register = async (ballot: Ballot): Promise<Ballot> => {
 
 // === 子芹 ===
 
-  export const getCommitment = async (): Promise<Commitment> => {
+export const getCommitment = async (ballot: Ballot): Promise<Commitment> => {
     try {
-        const response = await axios.get(`${BACKEND_URL}/VA/get_commitment`);
+        const response = await axios.post<Commitment>(`${BACKEND_URL}/VA/get_commitment`, {
+            ballot: ballot,
+        });
+        
         if (response.status === 200) {
-            return response.data;
+            const formattedData: Commitment = Object.fromEntries(
+                Object.entries(response.data).map(([key, [commitment, ballot_signature]]) => [
+                    key,
+                    [
+                        commitment.map(BigInt),
+                        [BigInt(ballot_signature[0]), BigInt(ballot_signature[1])]
+                    ]
+                ])
+            );
+            return formattedData;
         }
         throw new Error(`Failed to fetch commitment, status: ${response.status}`);
     } catch (error) {
@@ -69,13 +81,23 @@ export const register = async (ballot: Ballot): Promise<Ballot> => {
 export const getProof = async (): Promise<Proof> => {
     try {
         const response = await axios.get(`${BACKEND_URL}/VA/get_proof`);
+        
         if (response.status === 200) {
-            return response.data; 
+            const formattedData: Proof = Object.fromEntries(
+                Object.entries(response.data).map(([key, value]) => [
+                    key,
+                    (value as any[][]).map((tuple) => [[
+                        [BigInt(tuple[0][0]), BigInt(tuple[0][1])],
+                        [BigInt(tuple[1][0]), BigInt(tuple[1][1])]
+                    ]])
+                ])
+            );
+            return formattedData;
         }
         throw new Error(`Failed to fetch proof, status: ${response.status}`);
     } catch (error) {
         console.error('Error fetching proof:', error);
-        throw error; 
+        throw error;
     }
 };
 

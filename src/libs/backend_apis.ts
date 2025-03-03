@@ -13,7 +13,7 @@ export const askEncryptedPairs = async (): Promise<EncryptedPairs> => {
         if (response.status === 200) {
             const formattedData: EncryptedPairs = Object.fromEntries(
                 Object.entries(response.data).map(([key, value]) => [
-                    key,
+                    parseInt(key),
                     (value as [number, number][]).map(pair => [BigInt(pair[0]), BigInt(pair[1])])
                 ])
             );

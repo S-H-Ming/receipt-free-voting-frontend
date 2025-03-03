@@ -12,7 +12,8 @@ import { type AccountInfo } from "@airgap/beacon-types";
 import { NetworkType } from "@airgap/beacon-types";
 import { CANDIDATES } from "@/environment";
 import { EventsService } from "@tzkt/sdk-events";
-import { ContextState, Candidate } from "@/interfaces/context.interface";
+import { ContextState, Candidate, EncryptedPairs } from "@/interfaces/context.interface";
+import { Voter } from "@/libs/mask_ballot";
 import * as nextAuth from "next-auth/react";
 import * as backendApis from "@/libs/backend_apis";
 
@@ -154,10 +155,6 @@ export const ContextProvider = (props: any) => {
     if (isInitLoading) {
       init();
     }
-    //tmp
-    // backendApis.askEncryptedPairs().then((data) => {
-    //   console.log(data);
-    // });
   }, [isInitLoading, init]);
 
   const updateMessage = (message: string) => setMessage(message);
@@ -171,6 +168,46 @@ export const ContextProvider = (props: any) => {
 
   const setStep = (step: ContextState["currentStep"]) => {
     setCurrentStep(step);
+    switch (step) {
+      case "connect_wallet":
+        break;
+      case "login_google":
+        break;
+      case "voting":
+        backendApis.askEncryptedPairs().then((encPairs) => {
+          const rsaN = BigInt("736270112415730588492485421210735645273779098054243591672750439722996117391987353772994557321116405168970421394378385270388976289677265840660669881236428663904701088161411043464615355608344596314149487814072855704116824134466719065062344836512380379120552900282269009588252253758528560327553667024571029749309986291825799437638152555968249769472112108041626007921102217919895090542408361660539112475161793221237455385218014371879343236107054154945944942824137800775238284644174995326741356343321021929378557790996531345288923696645281279044239851801045024499546238813355671025539860099380214443582117591792978060250077860710829025079073922195638057774063671802941371462567309557546983008266168196647624295858223526418594508225503508306000825269784250441863575393575647776819529732283960736897823167197747494461691046777351097224300022842837140970278389408979665810172632949851763215013332197082920215650336332618575272252246165007661027337140304730004448362015184314763207705145194985561062699360290022844309625379244329040655129296361768751233204693815772450442630765793290194287443833794000730301234724413538504337512166566804140320757132425910260595755333903617414791907623666180671752637001829242753079629651224176867663353645907"); 
+          const rsaV = BigInt("65537"); 
+          const voter = new Voter();
+          setCandidates(prevCandidates =>
+            prevCandidates.map(candidate => {
+                const candidateEncPairs = encPairs[candidate.id];
+                if (!candidateEncPairs) {
+                  throw new Error(`Mismatch in candidate ID: ${candidate.id}`);
+                }
+                voter.receiveEncPairs(candidateEncPairs);
+                const ballot = voter.generateBallot(rsaN, rsaV);
+        
+                if (!voter["mask"] || !voter["maskInv"]) {
+                    throw new Error(`Mask generation failed for candidate: ${candidate.name}`);
+                }
+        
+                return {
+                    ...candidate,
+                    mask: voter["mask"] as bigint,
+                    mask_inv: voter["maskInv"] as bigint,
+                    ballot: [ballot.b1, ballot.b2],
+                };
+            })
+        );
+        });
+        break;
+      case "voting_success":
+        break;
+      case "tally_pending":
+        break;
+      case "tally_completed":
+        break;  
+    }
   };
 
   // const updateGoogleAccount = (account: string | undefined) => {

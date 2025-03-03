@@ -23,6 +23,10 @@ export interface Candidate {
   name: string;
   address?: string;
   checked: boolean;
+  mask?: bigint;
+  mask_inv?: bigint;
+  ballot?: [bigint, bigint];
+  ballot_sig?: [bigint, bigint];
 }
 
 export interface Commitment {

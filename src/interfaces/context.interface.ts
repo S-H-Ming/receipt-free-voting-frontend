@@ -32,14 +32,11 @@ export interface Candidate {
 }
 
 export interface Commitment {
-  commitment: string;
-  seed: number;
-  proof: [[number, number], [number, number]][];
+  [key: string]: [ commitment: bigint[], ballot_signature: [bigint, bigint] ];// commitment is an array of bigints, ballot_signature is a tuple of two bigints
 }
 
 export interface Proof {
-  seed: number;
-  proof: [[number, number], [number, number]][];
+  [key: string]: [ [ [bigint, bigint], [bigint, bigint] ] ] [];
 }
 
 // export interface encrypted_pairs {

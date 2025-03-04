@@ -32,13 +32,6 @@ export interface Candidate {
 }
 
 export interface Commitment {
-<<<<<<< HEAD
-  [key: string]: [ commitment: bigint[], ballot_signature: [bigint, bigint] ];// commitment is an array of bigints, ballot_signature is a tuple of two bigints
-}
-
-export interface Proof {
-  [key: string]: [ [ [bigint, bigint], [bigint, bigint] ] ] [];
-=======
   commitment: string;
   seed: number;
   proof: [[number, number], [number, number]][];
@@ -47,7 +40,6 @@ export interface Proof {
 export interface Proof {
   seed: number;
   proof: [[number, number], [number, number]][];
->>>>>>> b9217349e0fe87a227905108a5f145ec4f4f28bf
 }
 
 // export interface encrypted_pairs {

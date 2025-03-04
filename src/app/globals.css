@@ -72,6 +72,10 @@
   .bg-pearl-color {
     background-color: var(--pearl-color);
   }
+
+  .border-main-color {
+    border-color: var(--white-color);
+  }
 }
 
 

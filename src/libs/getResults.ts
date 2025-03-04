@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { ResultResponse } from '@/interfaces/context.interface';
 
 const API_URL = "https://blockchain-vote.imlab.app/backend";
@@ -21,4 +22,3 @@ export const getResults = async (): Promise<ResultResponse> => {
     throw error;
   }
 };
-

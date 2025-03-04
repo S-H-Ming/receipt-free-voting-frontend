@@ -1,19 +1,96 @@
-import { AccountInfo } from "@airgap/beacon-types"
-import { BeaconWallet } from "@taquito/beacon-wallet"
-import { TezosToolkit } from "@taquito/taquito"
+import { AccountInfo } from "@airgap/beacon-types";
+import { BeaconWallet } from "@taquito/beacon-wallet";
+import { TezosToolkit } from "@taquito/taquito";
+
+export enum VotingStep {
+  CONNECT_WALLET = "connect_wallet",
+  LOGIN_GOOGLE = "login_google",
+  VOTING = "voting",
+  VOTING_SUCCESS = "voting_success",
+  TALLY_PENDING = "tally_pending",
+  TALLY_COMPLETED = "tally_completed",
+}
+
+export interface ResultResponse {
+  result: "yes" | "no";
+}
+
+export interface EncryptedResultResponse {
+  eresult: number;
+}
+
+export interface Candidate {
+  id: number;
+  imageURL: string;
+  name: string;
+  address?: string;
+  checked: boolean;
+  mask?: bigint;
+  mask_inv?: bigint;
+  ballot?: [bigint, bigint];
+  ballot_sig?: [bigint, bigint];
+}
+
+export interface Commitment {
+<<<<<<< HEAD
+  [key: string]: [ commitment: bigint[], ballot_signature: [bigint, bigint] ];// commitment is an array of bigints, ballot_signature is a tuple of two bigints
+}
+
+export interface Proof {
+  [key: string]: [ [ [bigint, bigint], [bigint, bigint] ] ] [];
+=======
+  commitment: string;
+  seed: number;
+  proof: [[number, number], [number, number]][];
+}
+
+export interface Proof {
+  seed: number;
+  proof: [[number, number], [number, number]][];
+>>>>>>> b9217349e0fe87a227905108a5f145ec4f4f28bf
+}
+
+// export interface encrypted_pairs {
+//   encrypted_pairs: [bigint, bigint][];
+// }
+
+export interface EncryptedPairs {
+  [key: string]: [bigint, bigint][];
+}
+
+export interface Ballot {
+  b1: bigint;
+  b2: bigint;
+}
+
+export interface register_voter {
+  email: string;
+  ballot: Ballot;
+}
+
+export interface RegisterResponse {
+  sign_ballot: [number, number];
+}
 
 export interface ContextState {
-  isInitLoading: boolean
-  gateways: { [key: string]: string }
-  tezos: TezosToolkit | null
-  wallet: BeaconWallet | null
-  acc?: AccountInfo
-  address?: string
-  message: string
-  updateMessage: (message: string) => void
-  setAccount: () => Promise<void>
-  syncTaquito: () => Promise<void>
-  disconnect: () => Promise<void>
+  isInitLoading: boolean;
+  gateways: { [key: string]: string };
+  tezos: TezosToolkit | null;
+  wallet: BeaconWallet | null;
+  acc?: AccountInfo;
+  address?: string;
+  message: string;
+  currentStep: VotingStep;
+  candidates: Candidate[];
+  setStep: (step: ContextState["currentStep"]) => void;
+  signInGoogle: (callbackUrl?: string) => Promise<boolean>;
+  signOutGoogle: () => Promise<void>;
+  updateMessage: (message: string) => void;
+  setAccount: () => Promise<void>;
+  syncTaquito: () => Promise<void>;
+  disconnect: () => Promise<void>;
+  handleVote: () => Promise<void>;
+  updateVote: (id: number, checked: boolean) => void;
   /**
    *
    * @param tokenList Gacha token list in a round. Each token will be an object consisting of fa2, id and amount.

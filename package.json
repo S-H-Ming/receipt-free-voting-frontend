@@ -1,5 +1,5 @@
 {
-  "name": "tzapex",
+  "name": "blockchain-vote",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -25,6 +25,7 @@
     "@tzkt/sdk-events": "^2.2.1",
     "dayjs": "^1.11.8",
     "next": "14.2.3",
+    "next-auth": "^5.0.0-beta.25",
     "patch-package": "8.0.0",
     "react": "^18",
     "react-dom": "^18",
@@ -47,7 +48,6 @@
     "typescript": "^5"
   },
   "overrides": {
-    "@parcel/watcher": "~2.1.0",
-    "solid-js": "0.0.0"
+    "@parcel/watcher": "~2.1.0"
   }
 }

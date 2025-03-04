@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 export interface ResultResponse {
     [key: string]: [number, number];
 }

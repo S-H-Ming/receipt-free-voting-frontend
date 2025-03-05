@@ -8,4 +8,5 @@ export const CANDIDATES: Candidate[] = [
     { id: 5, name: "test5", imageURL: "/images/test.jpg", address: "KT1CKziJciRoXUe36a4SMyMs2w368QPEqPNf" }
   ].map(candidate => ({ ...candidate, checked: false }));
 
-export const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL
+export const VA_SERVER_URL = process.env.NEXT_PUBLIC_VA_SERVER_URL
+export const IA_SERVER_URL = process.env.NEXT_PUBLIC_IA_SERVER_URL

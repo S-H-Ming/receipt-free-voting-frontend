@@ -38,7 +38,7 @@ const Validation = () => {
     if (
       walletConnected &&
       googleConnected &&
-      candidates.length > 0 &&
+      // candidates.length > 0 &&
       currentStep !== VotingStep.VOTING
     ) {
       setStep(VotingStep.VOTING);

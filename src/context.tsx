@@ -38,6 +38,8 @@ export const ContextProvider = (props: any) => {
   );
 
   const [candidates, setCandidates] = useState<ContextState["candidates"]>([]);
+  const [gmail, setGmail] = useState<string | undefined>(undefined);
+  const [candidatesAreInit, setCandidatesAreInit] = useState<boolean>(false);
 
   /* 
   const handleVote = async (candidate: Candidate) => {
@@ -72,22 +74,28 @@ export const ContextProvider = (props: any) => {
 
     try {
       // filter out candidates w/o address
-      const validCandidates = candidates.filter((c) => c.address);
-      if (validCandidates.length === 0) {
-        alert("No valid candidates to vote for.");
+      if (!candidatesAreInit) {
+        alert("Candidates are not initialized. Please press the 'Vote' button later.");
         return;
       }
 
       // get all contracts from each candidate
       const batchOps: WalletParamsWithKind[] = await Promise.all(
-        validCandidates.map(async (candidate) => {
+        candidates.map(async (candidate) => {
+          // if (!(candidate.address && candidate.va_ballot_sig && candidate.ia_ballot_sig && 
+          //   candidate.commitment_bit && candidate.mask && candidate.mask_inv)) {
+          //   console.error("Invalid candidate data:", candidate);
+          //   throw new Error("Invalid candidate data.");
+          // }
+          console.log(candidate);
           const contract = await tezos.wallet.at(candidate.address!);
+          const vchoice = candidate.checked !== candidate.commitment_bit;
           const transferParams = contract.methodsObject
             .vote({
-              ballot_sig: 0,
-              mask_inv: 0,
-              mask: 0,
-              v: 0,
+              ballot_sig: candidate.va_ballot_sig![vchoice ? 1 : 0],
+              mask_inv: candidate.mask_inv,
+              mask: candidate.mask,
+              v: candidate.ia_ballot_sig![vchoice ? 1 : 0]
             })
             .toTransferParams();
 
@@ -188,7 +196,7 @@ export const ContextProvider = (props: any) => {
 
     const InitializedCandidates = await Promise.all(
       Object.entries(data).map(async ([key, value]) => {
-        const id = parseInt(key);
+        const id = value.id;
         const imageURL = value.img;
         const name = value.names;
         const description = value.description;
@@ -205,68 +213,38 @@ export const ContextProvider = (props: any) => {
         if (!voter["mask"] || !voter["maskInv"]) {
           throw new Error(`Mask generation failed for candidate: ${name}`);
         }
-
-        // register
-        const signedBallot = await backendApis.register(ballot);
-
-        // get commitment
-        // const commitment = await backendApis.getCommitment();
-        // const proof = await backendApis.getProof();
+        const ia_signedBallot = await backendApis.register(ballot);
+        const commitment = await backendApis.getCommitment(ia_signedBallot, id);
 
         return {
           id: id,
           imageURL: imageURL,
           name: name,
           description: description,
+          address: value.address,
           checked: false,
           mask: voter["mask"] as bigint,
           mask_inv: voter["maskInv"] as bigint,
-          ballot: [signedBallot.b1, signedBallot.b2] as [bigint, bigint],
+          ballot: [ballot.b1, ballot.b2] as [bigint, bigint],
+          ia_ballot_sig: [ia_signedBallot.b1, ia_signedBallot.b2] as [bigint, bigint],
+          va_ballot_sig: commitment.ballot_signature as [bigint, bigint],
+          commitment_bit: commitment.commitment,
         };
       })
     );
 
     setCandidates(InitializedCandidates);
+    console.log("Candidates are initialized.");
+    setCandidatesAreInit(true);
   };
 
   useEffect(() => {
+    console.log("Current step: ", currentStep);
     switch (currentStep) {
       case VotingStep.CONNECT_WALLET:
-        initCandidates();
         break;
       case VotingStep.VOTING:
-        // backendApis.askEncryptedPairs().then((encPairs) => {
-        //   const rsaN = BigInt(
-        //     "736270112415730588492485421210735645273779098054243591672750439722996117391987353772994557321116405168970421394378385270388976289677265840660669881236428663904701088161411043464615355608344596314149487814072855704116824134466719065062344836512380379120552900282269009588252253758528560327553667024571029749309986291825799437638152555968249769472112108041626007921102217919895090542408361660539112475161793221237455385218014371879343236107054154945944942824137800775238284644174995326741356343321021929378557790996531345288923696645281279044239851801045024499546238813355671025539860099380214443582117591792978060250077860710829025079073922195638057774063671802941371462567309557546983008266168196647624295858223526418594508225503508306000825269784250441863575393575647776819529732283960736897823167197747494461691046777351097224300022842837140970278389408979665810172632949851763215013332197082920215650336332618575272252246165007661027337140304730004448362015184314763207705145194985561062699360290022844309625379244329040655129296361768751233204693815772450442630765793290194287443833794000730301234724413538504337512166566804140320757132425910260595755333903617414791907623666180671752637001829242753079629651224176867663353645907"
-        //   );
-        //   const rsaV = BigInt("65537");
-        //   const voter = new Voter();
-
-        //   setCandidates((prevCandidates) =>
-        //     prevCandidates.map((candidate) => {
-        //       console.log(candidate.id);
-        //       const candidateEncPairs = encPairs[candidate.id];
-        //       if (!candidateEncPairs) {
-        //         throw new Error(`Mismatch in candidate ID: ${candidate.id}`);
-        //       }
-        //       voter.receiveEncPairs(candidateEncPairs);
-        //       const ballot = voter.generateBallot(rsaN, rsaV);
-
-        //       if (!voter["mask"] || !voter["maskInv"]) {
-        //         throw new Error(
-        //           `Mask generation failed for candidate: ${candidate.name}`
-        //         );
-        //       }
-
-        //       return {
-        //         ...candidate,
-        //         mask: voter["mask"] as bigint,
-        //         mask_inv: voter["maskInv"] as bigint,
-        //         ballot: [ballot.b1, ballot.b2],
-        //       };
-        //     })
-        //   );
-        // });
+        initCandidates();
         break;
       case VotingStep.VOTING_SUCCESS:
         break;
@@ -275,11 +253,7 @@ export const ContextProvider = (props: any) => {
       case VotingStep.TALLY_COMPLETED:
         break;
     }
-  }, [currentStep, candidates]);
-
-  // const updateGoogleAccount = (account: string | undefined) => {
-  //   setGoogleAccount(account);
-  // };
+  }, [currentStep]);
 
   const syncTaquito = async () => {
     // We check the storage and only do a permission request if we don't have an active account yet
@@ -322,6 +296,7 @@ export const ContextProvider = (props: any) => {
   };
 
   const signInGoogle = async (callbackUrl: string = "") => {
+    console.log("sign in google");
     const session = await nextAuth.getSession();
     if (session) {
       await signOutGoogle();
@@ -335,7 +310,6 @@ export const ContextProvider = (props: any) => {
     });
 
     isSuccess = result ? result.ok : false;
-
     return isSuccess;
   };
 
@@ -355,6 +329,7 @@ export const ContextProvider = (props: any) => {
         message,
         currentStep,
         candidates,
+        gmail,
         setStep,
         signInGoogle,
         signOutGoogle,

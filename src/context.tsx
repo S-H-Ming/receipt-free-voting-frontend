@@ -66,18 +66,14 @@ export const ContextProvider = (props: any) => {
           const contract = await tezos.wallet.at(candidate.address!);
           const vchoice = candidate.checked !== commitment.commitment;
 
-          console.log("Voting for candidate: ", candidate.address);
-          console.log(commitment.ballot_signature[vchoice ? 1 : 0].toString());
-          console.log(candidate.mask_inv?.toString());
-          console.log(candidate.mask?.toString());
-          console.log(ia_signedBallots[idx][vchoice ? 1 : 0].toString());
+          // console.log("Voting for candidate: ", candidate.address);
+          // console.log(commitment.ballot_signature[vchoice ? 1 : 0].toString());
+          // console.log(candidate.mask_inv?.toString());
+          // console.log(candidate.mask?.toString());
+          // console.log(ia_signedBallots[idx][vchoice ? 1 : 0].toString());
 
           const transferParams = contract.methodsObject
             .vote({
-              // ballot_sig: candidate.va_ballot_sig![vchoice ? 1 : 0],
-              // mask_inv: candidate.mask_inv,
-              // mask: candidate.mask,
-              // v: candidate.ia_ballot_sig![vchoice ? 1 : 0]
               ballot_sig: commitment.ballot_signature[vchoice ? 1 : 0],
               mask_inv: candidate.mask_inv,
               mask: candidate.mask,

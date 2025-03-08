@@ -108,10 +108,8 @@ export class Voter {
 
         if (b1 >= rsaN || b2 >= rsaN) throw new Error("Ballot values must be less than RSA modulus.");
 
-        return {
-            b1: (b1 * fastModExp(mask, rsaV, rsaN)) % rsaN,
-            b2: (b2 * fastModExp(mask, rsaV, rsaN)) % rsaN
-        };
+        return [(b1 * fastModExp(mask, rsaV, rsaN)) % rsaN, (b2 * fastModExp(mask, rsaV, rsaN)) % rsaN];
+            
     }
 }
 

@@ -40,20 +40,23 @@ export const askEncryptedPairs = async (): Promise<EncryptedPairs> => {
   }
 };
 
-export const register = async (ballot: Ballot): Promise<Ballot> => {
+export const register = async (ballots: Ballot[]): Promise<Ballot[]> => {
   const session = await getSession();
   if (session?.user?.identifier === undefined) {
     throw new Error("User not logged in");
   }
 
   try {
-    const ballotTuple: [string, string] = [ballot.b1.toString(), ballot.b2.toString()];
-    // console.log("Registering with ballot:", ballotTuple);
+    const ballotTuples: [string, string][] = ballots.map((ballot) => [
+      ballot[0].toString(),
+      ballot[1].toString(),
+    ]);
     const response = await axios.post<RegisterResponse>(
       `${IA_SERVER_URL}/IA/register`,
       {
-        email: session.user.identifier,
-        ballot: ballotTuple,
+        // email: session.user.identifier,
+        email : "345",
+        ballot: ballotTuples,
       },
       {
         headers: {
@@ -63,8 +66,8 @@ export const register = async (ballot: Ballot): Promise<Ballot> => {
     );
 
     if (response.status === 200) {
-      const [b1, b2] = response.data.sign_ballot;
-      return { b1: BigInt(b1), b2: BigInt(b2) };
+      const sign_ballots = response.data.sign_ballot;
+      return sign_ballots.map((pair) => [BigInt(pair[0]), BigInt(pair[1])]);
     } else {
       throw new Error(`Unexpected response status: ${response.status}`);
     }
@@ -76,13 +79,14 @@ export const register = async (ballot: Ballot): Promise<Ballot> => {
 
 // === 子芹 ===
 
-export const getCommitment = async (ballot: Ballot, id: number): Promise<Commitment> => {
+export const getCommitment = async (ballot: Ballot, id: number, ep: [bigint, bigint][]): Promise<Commitment> => {
 
-  const ballotTuple: [string, string] = [ballot.b1.toString(), ballot.b2.toString()];
+  const ballotTuple: [string, string] = ballot.map(num => num.toString()) as [string, string];
     try {
         const response = await axios.post<CommitmentReponse>(`${VA_SERVER_URL}/VA/get_commitment`, {
             sign_ballot: ballotTuple,
-            id: id
+            id: id,
+            ep: ep.map(pair => [pair[0].toString(), pair[1].toString()])
         });
         
         if (response.status === 200) {

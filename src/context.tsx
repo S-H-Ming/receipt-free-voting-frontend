@@ -10,7 +10,6 @@ import {
 } from "@taquito/taquito";
 import { type AccountInfo } from "@airgap/beacon-types";
 import { NetworkType } from "@airgap/beacon-types";
-import { CANDIDATES } from "@/environment";
 import { EventsService } from "@tzkt/sdk-events";
 import {
   ContextState,
@@ -41,30 +40,6 @@ export const ContextProvider = (props: any) => {
   const [gmail, setGmail] = useState<string | undefined>(undefined);
   const [candidatesAreInit, setCandidatesAreInit] = useState<boolean>(false);
 
-  /* 
-  const handleVote = async (candidate: Candidate) => {
-    if (!tezos) {
-      console.error("Tezos toolkit is not initialized.");
-      alert("Please connect your wallet before voting.");
-      return;
-    }
-    try {
-      const contract = await tezos.wallet.at(candidate.address!);
-      const op = await contract.methodsObject.vote({
-        ballot_sig: 0,
-        mask_inv: 0,
-        mask: 0,      
-        v: 0     
-      }).send();
-      await op.confirmation();
-      setStep("voting_success");
-      alert(`Voted successfully! Operation hash : ${op.opHash}`);
-    } catch (error) {
-      console.error("Error while voting : ", error);
-    }
-  };
-  */
-
   const handleVote = async () => {
     if (!tezos) {
       console.error("Tezos toolkit is not initialized.");
@@ -74,28 +49,39 @@ export const ContextProvider = (props: any) => {
 
     try {
       // filter out candidates w/o address
+      console.log("Voting...")
       if (!candidatesAreInit) {
         alert("Candidates are not initialized. Please press the 'Vote' button later.");
         return;
       }
 
+      const ballots = candidates.map((candidate) => candidate.ballot);
+      const ia_signedBallots = await backendApis.register(ballots);
+
       // get all contracts from each candidate
       const batchOps: WalletParamsWithKind[] = await Promise.all(
-        candidates.map(async (candidate) => {
-          // if (!(candidate.address && candidate.va_ballot_sig && candidate.ia_ballot_sig && 
-          //   candidate.commitment_bit && candidate.mask && candidate.mask_inv)) {
-          //   console.error("Invalid candidate data:", candidate);
-          //   throw new Error("Invalid candidate data.");
-          // }
-          console.log(candidate);
+        candidates.map(async (candidate, idx) => {
+          // const ia_signedBallot = await backendApis.register({b1:candidate.ballot[0], b2:candidate.ballot[1]});
+          const commitment = await backendApis.getCommitment(ia_signedBallots[idx], candidate.id, candidate.enc_pairs);
           const contract = await tezos.wallet.at(candidate.address!);
-          const vchoice = candidate.checked !== candidate.commitment_bit;
+          const vchoice = candidate.checked !== commitment.commitment;
+
+          console.log("Voting for candidate: ", candidate.address);
+          console.log(commitment.ballot_signature[vchoice ? 1 : 0].toString());
+          console.log(candidate.mask_inv?.toString());
+          console.log(candidate.mask?.toString());
+          console.log(ia_signedBallots[idx][vchoice ? 1 : 0].toString());
+
           const transferParams = contract.methodsObject
             .vote({
-              ballot_sig: candidate.va_ballot_sig![vchoice ? 1 : 0],
+              // ballot_sig: candidate.va_ballot_sig![vchoice ? 1 : 0],
+              // mask_inv: candidate.mask_inv,
+              // mask: candidate.mask,
+              // v: candidate.ia_ballot_sig![vchoice ? 1 : 0]
+              ballot_sig: commitment.ballot_signature[vchoice ? 1 : 0],
               mask_inv: candidate.mask_inv,
               mask: candidate.mask,
-              v: candidate.ia_ballot_sig![vchoice ? 1 : 0]
+              v: ia_signedBallots[idx][vchoice ? 1 : 0]
             })
             .toTransferParams();
 
@@ -189,7 +175,7 @@ export const ContextProvider = (props: any) => {
     const data = await backendApis.getCandidates();
     const encPairs = await backendApis.askEncryptedPairs();
     const rsaN = BigInt(
-      "736270112415730588492485421210735645273779098054243591672750439722996117391987353772994557321116405168970421394378385270388976289677265840660669881236428663904701088161411043464615355608344596314149487814072855704116824134466719065062344836512380379120552900282269009588252253758528560327553667024571029749309986291825799437638152555968249769472112108041626007921102217919895090542408361660539112475161793221237455385218014371879343236107054154945944942824137800775238284644174995326741356343321021929378557790996531345288923696645281279044239851801045024499546238813355671025539860099380214443582117591792978060250077860710829025079073922195638057774063671802941371462567309557546983008266168196647624295858223526418594508225503508306000825269784250441863575393575647776819529732283960736897823167197747494461691046777351097224300022842837140970278389408979665810172632949851763215013332197082920215650336332618575272252246165007661027337140304730004448362015184314763207705145194985561062699360290022844309625379244329040655129296361768751233204693815772450442630765793290194287443833794000730301234724413538504337512166566804140320757132425910260595755333903617414791907623666180671752637001829242753079629651224176867663353645907"
+      "692973201049836963740004635736578819082507909485365443699902436018047601908500734186193981258316498326562938400978222997431256301414601779088231625872823780361512532852450679735389254994070782351682258794106346609673767520507628788725326521229405877807259394408359580466622987621402768791912899130887718229254951765168351036536684401041619964071931457662280619235539160584727089144091925819361633150567054541889086484693270961875141083284602321143984725509035856524845351402598905306940783365209559241828200437568555929468381783815508913753248380067394565998544805153814673567399363236606693505793040735222618489201020286395544091708248505330816558194197590158453333208903623741047305382317302448157002724345110336907932508785112145653114664073364886446319054376654428844641972035945791789356339583339555511428826707215597114314490528568908695764997001607870447559845884056074002253614719756229420904597957419117893841846102370298338835269337928107229527112876946054888638694388354541796990152731769206013406234053672261630158020537935456579396931794296518094452144899770364176978066337475826378376071763127206392365983505108885598015565936652274738612404863875862832180953020836163096565721135456196330956641693960863997087871193467"
     );
     const rsaV = BigInt("65537");
     const voter = new Voter();
@@ -213,8 +199,8 @@ export const ContextProvider = (props: any) => {
         if (!voter["mask"] || !voter["maskInv"]) {
           throw new Error(`Mask generation failed for candidate: ${name}`);
         }
-        const ia_signedBallot = await backendApis.register(ballot);
-        const commitment = await backendApis.getCommitment(ia_signedBallot, id);
+        // const ia_signedBallot = await backendApis.register(ballot);
+        // const commitment = await backendApis.getCommitment(ia_signedBallot, id, candidateEncPairs);
 
         return {
           id: id,
@@ -225,10 +211,11 @@ export const ContextProvider = (props: any) => {
           checked: false,
           mask: voter["mask"] as bigint,
           mask_inv: voter["maskInv"] as bigint,
-          ballot: [ballot.b1, ballot.b2] as [bigint, bigint],
-          ia_ballot_sig: [ia_signedBallot.b1, ia_signedBallot.b2] as [bigint, bigint],
-          va_ballot_sig: commitment.ballot_signature as [bigint, bigint],
-          commitment_bit: commitment.commitment,
+          ballot: ballot,
+          enc_pairs: candidateEncPairs
+          // ia_ballot_sig: [ia_signedBallot.b1, ia_signedBallot.b2] as [bigint, bigint],
+          // va_ballot_sig: commitment.ballot_signature as [bigint, bigint],
+          // commitment_bit: commitment.commitment,
         };
       })
     );

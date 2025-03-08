@@ -27,7 +27,8 @@ export interface Candidate {
   checked: boolean;
   mask?: bigint;
   mask_inv?: bigint;
-  ballot?: [bigint, bigint];
+  ballot: [bigint, bigint];
+  enc_pairs: [bigint, bigint][]; 
   ia_ballot_sig?: [bigint, bigint];
   va_ballot_sig?: [bigint, bigint];
   commitment_bit?: boolean;
@@ -50,10 +51,12 @@ export interface EncryptedPairs {
   [key: string]: [bigint, bigint][];
 }
 
-export interface Ballot {
-  b1: bigint;
-  b2: bigint;
-}
+// export interface Ballot {
+//   b1: bigint;
+//   b2: bigint;
+// }
+
+export type Ballot = [bigint, bigint];
 
 export interface register_voter {
   email: string;
@@ -61,7 +64,7 @@ export interface register_voter {
 }
 
 export interface RegisterResponse {
-  sign_ballot: [number, number];
+  sign_ballot: [string, string][];
 }
 
 export interface ContextState {

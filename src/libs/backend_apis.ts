@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { BACKEND_URL } from "@/environment";
+import { VA_SERVER_URL, IA_SERVER_URL } from "@/environment";
 import {
   EncryptedPairs,
   Commitment,
@@ -9,20 +9,21 @@ import {
   ResultResponse,
   EncryptedResultResponse,
   RegisterResponse,
+  CommitmentReponse,
 } from "@/interfaces/context.interface";
-import { useSession } from "next-auth/react";
+import { getSession } from "next-auth/react";
 import { Candidate } from "../interfaces/apiTypes";
 // === 乙馨 ===
 
 export const askEncryptedPairs = async (): Promise<EncryptedPairs> => {
   try {
-    console.log(`Fetching encrypted pairs from ${BACKEND_URL}/VA/get_pairs`);
-    const response = await axios.get(`${BACKEND_URL}/VA/get_pairs`);
+    console.log(`Fetching encrypted pairs from ${VA_SERVER_URL}/VA/get_pairs`);
+    const response = await axios.get(`${VA_SERVER_URL}/VA/get_pairs`);
     if (response.status === 200) {
       const formattedData: EncryptedPairs = Object.fromEntries(
         Object.entries(response.data).map(([key, value]) => [
           parseInt(key),
-          (value as [number, number][]).map((pair) => [
+          (value as [string, string][]).map((pair) => [
             BigInt(pair[0]),
             BigInt(pair[1]),
           ]),
@@ -39,26 +40,34 @@ export const askEncryptedPairs = async (): Promise<EncryptedPairs> => {
   }
 };
 
-export const register = async (ballot: Ballot): Promise<Ballot> => {
-  const { data: session } = useSession();
-
-  if (!session?.user?.identifier) {
-    throw new Error("User not authenticated");
+export const register = async (ballots: Ballot[]): Promise<Ballot[]> => {
+  const session = await getSession();
+  if (session?.user?.identifier === undefined) {
+    throw new Error("User not logged in");
   }
 
   try {
-    const ballotTuple: [bigint, bigint] = [ballot.b1, ballot.b2];
+    const ballotTuples: [string, string][] = ballots.map((ballot) => [
+      ballot[0].toString(),
+      ballot[1].toString(),
+    ]);
     const response = await axios.post<RegisterResponse>(
-      `${BACKEND_URL}/ia/register`,
+      `${IA_SERVER_URL}/IA/register`,
       {
-        email: session.user.identifier,
-        ballot: ballotTuple,
+        // email: session.user.identifier,
+        email : "345",
+        ballot: ballotTuples,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json"
+        }
       }
     );
 
     if (response.status === 200) {
-      const [b1, b2] = response.data.sign_ballot;
-      return { b1: BigInt(b1), b2: BigInt(b2) };
+      const sign_ballots = response.data.sign_ballot;
+      return sign_ballots.map((pair) => [BigInt(pair[0]), BigInt(pair[1])]);
     } else {
       throw new Error(`Unexpected response status: ${response.status}`);
     }
@@ -70,23 +79,20 @@ export const register = async (ballot: Ballot): Promise<Ballot> => {
 
 // === 子芹 ===
 
-export const getCommitment = async (ballot: Ballot): Promise<Commitment> => {
+export const getCommitment = async (ballot: Ballot, id: number, ep: [bigint, bigint][]): Promise<Commitment> => {
+
+  const ballotTuple: [string, string] = ballot.map(num => num.toString()) as [string, string];
     try {
-        const response = await axios.post<Commitment>(`${BACKEND_URL}/VA/get_commitment`, {
-            ballot: ballot,
+        const response = await axios.post<CommitmentReponse>(`${VA_SERVER_URL}/VA/get_commitment`, {
+            sign_ballot: ballotTuple,
+            id: id,
+            ep: ep.map(pair => [pair[0].toString(), pair[1].toString()])
         });
         
         if (response.status === 200) {
-            const formattedData: Commitment = Object.fromEntries(
-                Object.entries(response.data).map(([key, [commitment, ballot_signature]]) => [
-                    key,
-                    [
-                        commitment.map(BigInt),
-                        [BigInt(ballot_signature[0]), BigInt(ballot_signature[1])]
-                    ]
-                ])
-            );
-            return formattedData;
+          const [b1, b2] = response.data.ballot_signature;
+          const commit_bit = !!response.data.commitment[0];
+          return { ballot_signature: [BigInt(b1),BigInt(b2)], commitment: commit_bit };
         }
         throw new Error(`Failed to fetch commitment, status: ${response.status}`);
     } catch (error) {
@@ -97,7 +103,7 @@ export const getCommitment = async (ballot: Ballot): Promise<Commitment> => {
 
 export const getProof = async (): Promise<Proof> => {
     try {
-        const response = await axios.get(`${BACKEND_URL}/VA/get_proof`);
+        const response = await axios.get(`${VA_SERVER_URL}/VA/get_proof`);
         
         if (response.status === 200) {
             const formattedData: Proof = Object.fromEntries(
@@ -127,7 +133,7 @@ export const getProof = async (): Promise<Proof> => {
 export const getEncryptedResult =
   async (): Promise<EncryptedResultResponse> => {
     try {
-      const response = await fetch(`${BACKEND_URL}/VA/get_encryptedresult`, {
+      const response = await fetch(`${VA_SERVER_URL}/VA/get_encryptedresult`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
@@ -146,7 +152,7 @@ export const getEncryptedResult =
 
 export const getResults = async (): Promise<ResultResponse> => {
   try {
-    const response = await fetch(`${BACKEND_URL}/VA/get_results`, {
+    const response = await fetch(`${VA_SERVER_URL}/VA/get_results`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     });
@@ -165,7 +171,7 @@ export const getResults = async (): Promise<ResultResponse> => {
 
 export const getCandidates = async (): Promise<Candidate[]> => {
   try {
-    const response = await fetch(`${BACKEND_URL}/get_candidates`, {
+    const response = await fetch(`${VA_SERVER_URL}/get_candidates`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     });

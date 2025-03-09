@@ -27,30 +27,36 @@ export interface Candidate {
   checked: boolean;
   mask?: bigint;
   mask_inv?: bigint;
-  ballot?: [bigint, bigint];
-  ballot_sig?: [bigint, bigint];
+  ballot: [bigint, bigint];
+  enc_pairs: [bigint, bigint][]; 
+  ia_ballot_sig?: [bigint, bigint];
+  va_ballot_sig?: [bigint, bigint];
+  commitment_bit?: boolean;
+}
+
+export interface CommitmentReponse {
+  commitment: number[], ballot_signature: [bigint, bigint];
 }
 
 export interface Commitment {
-  [key: string]: [ commitment: bigint[], ballot_signature: [bigint, bigint] ];// commitment is an array of bigints, ballot_signature is a tuple of two bigints
+  commitment: boolean;
+  ballot_signature: [bigint, bigint];
 }
 
 export interface Proof {
   [key: string]: [ [ [bigint, bigint], [bigint, bigint] ] ] [];
 }
 
-// export interface encrypted_pairs {
-//   encrypted_pairs: [bigint, bigint][];
-// }
-
 export interface EncryptedPairs {
   [key: string]: [bigint, bigint][];
 }
 
-export interface Ballot {
-  b1: bigint;
-  b2: bigint;
-}
+// export interface Ballot {
+//   b1: bigint;
+//   b2: bigint;
+// }
+
+export type Ballot = [bigint, bigint];
 
 export interface register_voter {
   email: string;
@@ -58,7 +64,7 @@ export interface register_voter {
 }
 
 export interface RegisterResponse {
-  sign_ballot: [number, number];
+  sign_ballot: [string, string][];
 }
 
 export interface ContextState {
@@ -71,6 +77,7 @@ export interface ContextState {
   message: string;
   currentStep: VotingStep;
   candidates: Candidate[];
+  gmail: string | undefined;
   setStep: (step: ContextState["currentStep"]) => void;
   signInGoogle: (callbackUrl?: string) => Promise<boolean>;
   signOutGoogle: () => Promise<void>;

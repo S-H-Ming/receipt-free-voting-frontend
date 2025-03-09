@@ -74,6 +74,12 @@ export class Voter {
         return b === BigInt(0) ? a : this.gcd(b, a % b);
     }
 
+    private bigIntToBytes(num: bigint, length: number) {
+        let hex = num.toString(16);
+        while (hex.length < length * 2) hex = "0" + hex;
+        return Buffer.from(hex, "hex");
+    }
+
     public generateBallot(rsaN: bigint, rsaV: bigint, hash: HashType | HashFunction = "sha256"): Ballot {
         if (!this.encPairs) throw new Error("No encrypted pairs received.");
         if (!this.mask || !this.maskInv) this.generateMask(rsaN);
@@ -85,33 +91,17 @@ export class Voter {
         const [b1orig, b2orig] = this.encPairs[0];
 
         // Hash the encrypted pairs with the mask
-        const b1hash = _hash(Uint8Array.from([
-            ...Uint8Array.from(Buffer.from(b1orig.toString(16), "hex")),
-            ...Uint8Array.from(Buffer.from(mask.toString(16), "hex"))
-        ]));
-
-        const b2hash = _hash(Uint8Array.from([
-            ...Uint8Array.from(Buffer.from(b2orig.toString(16), "hex")),
-            ...Uint8Array.from(Buffer.from(mask.toString(16), "hex"))
-        ]));
+        const b1Hash = _hash(Buffer.concat([this.bigIntToBytes(b1orig, this.choiceLength), this.bigIntToBytes(mask, this.maskLength)]));
+        const b2Hash = _hash(Buffer.concat([this.bigIntToBytes(b2orig, this.choiceLength), this.bigIntToBytes(mask, this.maskLength)]));
 
         // Create new ballot numbers
-        const b1 = BigInt("0x" + Buffer.from([
-            ...Uint8Array.from(Buffer.from(b1orig.toString(16), "hex")),
-            ...b1hash
-        ]).toString("hex"));
-
-        const b2 = BigInt("0x" + Buffer.from([
-            ...Uint8Array.from(Buffer.from(b2orig.toString(16), "hex")),
-            ...b2hash
-        ]).toString("hex"));
+        const b1 = BigInt("0x" + Buffer.concat([this.bigIntToBytes(b1orig, this.choiceLength), b1Hash]).toString("hex"));
+        const b2 = BigInt("0x" + Buffer.concat([this.bigIntToBytes(b2orig, this.choiceLength), b2Hash]).toString("hex"));
 
         if (b1 >= rsaN || b2 >= rsaN) throw new Error("Ballot values must be less than RSA modulus.");
 
-        return {
-            b1: (b1 * fastModExp(mask, rsaV, rsaN)) % rsaN,
-            b2: (b2 * fastModExp(mask, rsaV, rsaN)) % rsaN
-        };
+        return [(b1 * fastModExp(mask, rsaV, rsaN)) % rsaN, (b2 * fastModExp(mask, rsaV, rsaN)) % rsaN];
+            
     }
 }
 

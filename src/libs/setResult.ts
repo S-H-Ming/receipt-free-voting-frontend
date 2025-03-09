@@ -1,11 +1,11 @@
-import { BACKEND_URL } from "@/environment";
+import {  VA_SERVER_URL } from "@/environment";
 
 // Fetch results from the API
 export const setResult = async (data: {
   [key: number]: number;
 }): Promise<void> => {
   try {
-    const response = await fetch(`${BACKEND_URL}/VA/set_result`, {
+    const response = await fetch(`${VA_SERVER_URL}/set_result`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),

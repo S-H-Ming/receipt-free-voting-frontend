@@ -7,6 +7,16 @@ export enum VotingStep {
   LOGIN_GOOGLE = "login_google",
   VOTING = "voting",
   VOTING_SUCCESS = "voting_success",
+  TALLY_PENDING = "tally_pending",
+  TALLY_COMPLETED = "tally_completed",
+}
+
+export interface ResultResponse {
+  result: "yes" | "no";
+}
+
+export interface EncryptedResultResponse {
+  eresult: number;
 }
 
 export interface Candidate {
@@ -15,6 +25,46 @@ export interface Candidate {
   name: string;
   address?: string;
   checked: boolean;
+  mask?: bigint;
+  mask_inv?: bigint;
+  ballot: [bigint, bigint];
+  enc_pairs: [bigint, bigint][]; 
+  ia_ballot_sig?: [bigint, bigint];
+  va_ballot_sig?: [bigint, bigint];
+  commitment_bit?: boolean;
+}
+
+export interface CommitmentReponse {
+  commitment: number[], ballot_signature: [bigint, bigint];
+}
+
+export interface Commitment {
+  commitment: boolean;
+  ballot_signature: [bigint, bigint];
+}
+
+export interface Proof {
+  [key: string]: [ [ [bigint, bigint], [bigint, bigint] ] ] [];
+}
+
+export interface EncryptedPairs {
+  [key: string]: [bigint, bigint][];
+}
+
+// export interface Ballot {
+//   b1: bigint;
+//   b2: bigint;
+// }
+
+export type Ballot = [bigint, bigint];
+
+export interface register_voter {
+  email: string;
+  ballot: Ballot;
+}
+
+export interface RegisterResponse {
+  sign_ballot: [string, string][];
 }
 
 export interface ContextState {
@@ -25,14 +75,9 @@ export interface ContextState {
   acc?: AccountInfo;
   address?: string;
   message: string;
-  currentStep:
-    | "connect_wallet"
-    | "login_google"
-    | "voting"
-    | "voting_success"
-    | "tally_pending"
-    | "tally_completed";
+  currentStep: VotingStep;
   candidates: Candidate[];
+  gmail: string | undefined;
   setStep: (step: ContextState["currentStep"]) => void;
   signInGoogle: (callbackUrl?: string) => Promise<boolean>;
   signOutGoogle: () => Promise<void>;

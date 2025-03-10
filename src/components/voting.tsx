@@ -9,11 +9,18 @@ export interface VotingCardProps {
   id: number;
   image: string; // 圖片的 URL
   name: string; // 候選人的名稱
-  onVote: (checked: boolean) => void;
+  onVote?: (checked: boolean) => void;
+  amount?: number;
 }
 
 // Candidate Card Component
-const VotingCard = ({ id, image, name, onVote }: VotingCardProps) => {
+export const CandidateCard = ({
+  id,
+  image,
+  name,
+  onVote,
+  amount,
+}: VotingCardProps) => {
   return (
     <div className="flex flex-col items-center bg-white shadow-lg rounded-2xl p-4">
       {/* Image Section */}
@@ -26,20 +33,15 @@ const VotingCard = ({ id, image, name, onVote }: VotingCardProps) => {
       <h3 className="text-lg font-medium mt-2 mb-4 text-center text-l1-color">
         {name}
       </h3>
-
-      {/* Vote Button */}
-      {/* <Button
-          type = "secondary"
-          onClick={onVote}
-        >
-          Vote
-        </Button> */}
-      <Toggle
-        checked={false}
-        onChange={(value) => {
-          onVote(value);
-        }}
-      />
+      {onVote !== undefined && (
+        <Toggle
+          checked={false}
+          onChange={(value) => {
+            onVote(value);
+          }}
+        />
+      )}
+      <div className="text-sm text-gray-500 text-main">{amount}</div>
     </div>
   );
 };
@@ -63,7 +65,7 @@ const VotingRoot = () => {
     <React.Fragment>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 p-12">
         {candidates.map((candidate) => (
-          <VotingCard
+          <CandidateCard
             id={candidate.id}
             image={candidate.imageURL}
             name={candidate.name}
@@ -75,8 +77,15 @@ const VotingRoot = () => {
         <Button
           type="primary"
           onClick={() => {
+            setIsLoading(true);
             // simulate voting sucess
-            handleVote();
+            handleVote()
+              .then(() => {
+                setIsLoading(false);
+              })
+              .catch(() => {
+                setIsLoading(false);
+              });
           }}
         >
           Vote

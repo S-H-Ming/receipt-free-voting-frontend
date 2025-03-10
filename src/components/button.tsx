@@ -1,4 +1,4 @@
-import React from "react"
+import React from "react";
 
 export default function Button({
   type,
@@ -7,35 +7,35 @@ export default function Button({
   link = "",
   target = "_self",
   onClick = () => {},
-  children
+  children,
 }: {
-  type: "primary" | "secondary"
-  fullWidth?: boolean
-  disabled?: boolean
-  link?: string
-  target?: "_blank" | "_self"
-  onClick?: () => void
-  children: React.ReactNode
+  type: "primary" | "secondary";
+  fullWidth?: boolean;
+  disabled?: boolean;
+  link?: string;
+  target?: "_blank" | "_self";
+  onClick?: () => void;
+  children: React.ReactNode;
 }) {
-  let bgColor = ""
-  let textColor = ""
-  let rounded = ""
+  let bgColor = "";
+  let textColor = "";
+  let rounded = "";
 
   switch (type) {
     default:
     case "primary":
-      bgColor = "bg-l1-color font-highlight text-lg"
-      textColor = "text-white"
-      rounded = "rounded-md px-4 py-1 pt-2"
-      break
+      bgColor = "bg-l1-color font-highlight text-lg disabled:bg-gray";
+      textColor = "text-white disabled:text-white";
+      rounded = "rounded-md px-4 py-1 pt-2";
+      break;
     case "secondary":
-      bgColor = "bg-l2-color disabled:bg-deepgray"
-      textColor = "text-deepgray disabled:text-white"
-      rounded = "rounded-2xl px-8 py-1"
-      break
+      bgColor = "bg-l2-color disabled:bg-gray";
+      textColor = "text-deepgray disabled:text-white";
+      rounded = "rounded-2xl px-8 py-1";
+      break;
   }
 
-  let width = fullWidth ? "w-full" : "w-fit"
+  let width = fullWidth ? "w-full" : "w-fit";
 
   if (link)
     return (
@@ -46,7 +46,7 @@ export default function Button({
       >
         {children}
       </a>
-    )
+    );
   return (
     <button
       className={`${bgColor} ${textColor} ${width} ${rounded} h-fit`}
@@ -55,5 +55,5 @@ export default function Button({
     >
       {children}
     </button>
-  )
+  );
 }

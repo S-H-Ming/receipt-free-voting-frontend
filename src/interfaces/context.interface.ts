@@ -28,14 +28,15 @@ export interface Candidate {
   mask?: bigint;
   mask_inv?: bigint;
   ballot: [bigint, bigint];
-  enc_pairs: [bigint, bigint][]; 
+  enc_pairs: [bigint, bigint][];
   ia_ballot_sig?: [bigint, bigint];
   va_ballot_sig?: [bigint, bigint];
   commitment_bit?: boolean;
 }
 
 export interface CommitmentReponse {
-  commitment: number[], ballot_signature: [bigint, bigint];
+  commitment: number[];
+  ballot_signature: [bigint, bigint];
 }
 
 export interface Commitment {
@@ -44,7 +45,7 @@ export interface Commitment {
 }
 
 export interface Proof {
-  [key: string]: [ [ [bigint, bigint], [bigint, bigint] ] ] [];
+  [key: string]: [[[bigint, bigint], [bigint, bigint]]][];
 }
 
 export interface EncryptedPairs {
@@ -83,6 +84,7 @@ export interface ContextState {
   signOutGoogle: () => Promise<void>;
   updateMessage: (message: string) => void;
   setAccount: () => Promise<void>;
+  initCandidates: () => Promise<void>;
   syncTaquito: () => Promise<void>;
   disconnect: () => Promise<void>;
   handleVote: () => Promise<void>;

@@ -49,9 +49,11 @@ export const ContextProvider = (props: any) => {
 
     try {
       // filter out candidates w/o address
-      console.log("Voting...")
+      console.log("Voting...");
       if (!candidatesAreInit) {
-        alert("Candidates are not initialized. Please press the 'Vote' button later.");
+        alert(
+          "Candidates are not initialized. Please press the 'Vote' button later."
+        );
         return;
       }
 
@@ -62,7 +64,11 @@ export const ContextProvider = (props: any) => {
       const batchOps: WalletParamsWithKind[] = await Promise.all(
         candidates.map(async (candidate, idx) => {
           // const ia_signedBallot = await backendApis.register({b1:candidate.ballot[0], b2:candidate.ballot[1]});
-          const commitment = await backendApis.getCommitment(ia_signedBallots[idx], candidate.id, candidate.enc_pairs);
+          const commitment = await backendApis.getCommitment(
+            ia_signedBallots[idx],
+            candidate.id,
+            candidate.enc_pairs
+          );
           const contract = await tezos.wallet.at(candidate.address!);
           const vchoice = candidate.checked !== commitment.commitment;
 
@@ -77,7 +83,7 @@ export const ContextProvider = (props: any) => {
               ballot_sig: commitment.ballot_signature[vchoice ? 1 : 0],
               mask_inv: candidate.mask_inv,
               mask: candidate.mask,
-              v: ia_signedBallots[idx][vchoice ? 1 : 0]
+              v: ia_signedBallots[idx][vchoice ? 1 : 0],
             })
             .toTransferParams();
 
@@ -208,7 +214,7 @@ export const ContextProvider = (props: any) => {
           mask: voter["mask"] as bigint,
           mask_inv: voter["maskInv"] as bigint,
           ballot: ballot,
-          enc_pairs: candidateEncPairs
+          enc_pairs: candidateEncPairs,
           // ia_ballot_sig: [ia_signedBallot.b1, ia_signedBallot.b2] as [bigint, bigint],
           // va_ballot_sig: commitment.ballot_signature as [bigint, bigint],
           // commitment_bit: commitment.commitment,
@@ -318,6 +324,7 @@ export const ContextProvider = (props: any) => {
         signOutGoogle,
         updateMessage,
         setAccount,
+        initCandidates,
         syncTaquito,
         disconnect,
         handleVote,

@@ -28,7 +28,7 @@ jobs:
           NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
           NEXT_PUBLIC_IA_SERVER_URL: ${{ vars.NEXT_PUBLIC_IA_SERVER_URL }}
           NEXT_PUBLIC_VA_SERVER_URL: ${{ vars.NEXT_PUBLIC_VA_SERVER_URL }}
-          AUTH_URL: ${{ vars.AUTH_URL }}
+          AUTH_URL: ${{ secrets.AUTH_URL }}
           AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
           AUTH_GOOGLE_ID: ${{ secrets.AUTH_GOOGLE_ID }}
           AUTH_GOOGLE_SECRET: ${{ secrets.AUTH_GOOGLE_SECRET }}
@@ -49,7 +49,7 @@ jobs:
           NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
           NEXT_PUBLIC_IA_SERVER_URL: ${{ vars.NEXT_PUBLIC_IA_SERVER_URL }}
           NEXT_PUBLIC_VA_SERVER_URL: ${{ vars.NEXT_PUBLIC_VA_SERVER_URL }}
-          AUTH_URL: ${{ vars.AUTH_URL }}
+          AUTH_URL: ${{ secrets.AUTH_URL }}
           AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
           AUTH_GOOGLE_ID: ${{ secrets.AUTH_GOOGLE_ID }}
           AUTH_GOOGLE_SECRET: ${{ secrets.AUTH_GOOGLE_SECRET }}
@@ -62,7 +62,7 @@ jobs:
           echo "NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}" > .env
           echo "NEXT_PUBLIC_IA_SERVER_URL=${{ vars.NEXT_PUBLIC_IA_SERVER_URL }}" >> .env
           echo "NEXT_PUBLIC_VA_SERVER_URL=${{ vars.NEXT_PUBLIC_VA_SERVER_URL }}" >> .env
-          echo "AUTH_URL=${{ vars.AUTH_URL }}" >> .env
+          echo "AUTH_URL=${{ secrets.AUTH_URL }}" >> .env
           echo "AUTH_SECRET=${{ secrets.AUTH_SECRET }}" >> .env
           echo "AUTH_GOOGLE_ID=${{ secrets.AUTH_GOOGLE_ID }}" >> .env
           echo "AUTH_GOOGLE_SECRET=${{ secrets.AUTH_GOOGLE_SECRET }}" >> .env

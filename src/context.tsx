@@ -10,16 +10,14 @@ import {
 } from "@taquito/taquito";
 import { type AccountInfo } from "@airgap/beacon-types";
 import { NetworkType } from "@airgap/beacon-types";
-import { EventsService } from "@tzkt/sdk-events";
 import {
   ContextState,
-  Candidate,
-  EncryptedPairs,
   VotingStep,
 } from "@/interfaces/context.interface";
 import { Voter } from "@/libs/mask_ballot";
 import * as nextAuth from "next-auth/react";
 import * as backendApis from "@/libs/backend_apis";
+import { ADMIN_WALLET } from "./constants";
 
 export const Context = createContext<ContextState>(null!);
 export const ContextProvider = (props: any) => {
@@ -39,6 +37,8 @@ export const ContextProvider = (props: any) => {
   const [candidates, setCandidates] = useState<ContextState["candidates"]>([]);
   const [gmail, setGmail] = useState<string | undefined>(undefined);
   const [candidatesAreInit, setCandidatesAreInit] = useState<boolean>(false);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+
 
   const handleVote = async () => {
     if (!tezos) {
@@ -71,13 +71,6 @@ export const ContextProvider = (props: any) => {
           );
           const contract = await tezos.wallet.at(candidate.address!);
           const vchoice = candidate.checked !== commitment.commitment;
-
-          // console.log("Voting for candidate: ", candidate.address);
-          // console.log(commitment.ballot_signature[vchoice ? 1 : 0].toString());
-          // console.log(candidate.mask_inv?.toString());
-          // console.log(candidate.mask?.toString());
-          // console.log(ia_signedBallots[idx][vchoice ? 1 : 0].toString());
-
           const transferParams = contract.methodsObject
             .vote({
               ballot_sig: commitment.ballot_signature[vchoice ? 1 : 0],
@@ -103,6 +96,43 @@ export const ContextProvider = (props: any) => {
       alert("Voting failed. Please try again.");
     }
   };
+
+  const revealResult = async () => {
+    if (!tezos) {
+      console.error("Tezos toolkit is not initialized.");
+      alert("Please connect your wallet before voting.");
+      return;
+    }
+    try {
+      const results = await backendApis.getResults();
+      const batchOps: WalletParamsWithKind[] = await Promise.all(
+        candidates.map(async (candidate) => {
+          const contract = await tezos.wallet.at(candidate.address!);
+          const transferParams = contract.methodsObject
+            .finalize({
+              proof: results[candidate.id][1],
+              result: results[candidate.id][0]
+            })
+            .toTransferParams();
+  
+          return {
+            kind: OpKind.TRANSACTION,
+            ...transferParams,
+          };
+        })
+      );
+      const res = await tezos.wallet.batch(batchOps).send();
+      await res.confirmation();
+
+      candidates.map(async (candidate) => {
+        candidate.amount = results[candidate.id][0];
+      });
+    }
+    catch (error) {
+      console.error("Error while revealing results:", error);
+      alert("Revealing results failed. Please try again.");
+    }
+  }
 
   const updateVote = (id: number, checked: boolean) => {
     setCandidates((prev) =>
@@ -164,6 +194,9 @@ export const ContextProvider = (props: any) => {
       tezos !== null ? await wallet?.client.getActiveAccount() : undefined
     );
     setAddress((await wallet?.client.getActiveAccount())?.address);
+    if (address) {
+      setIsAdmin(ADMIN_WALLET.includes(address));
+    }
   };
 
   const setStep = (step: VotingStep) => {
@@ -221,7 +254,6 @@ export const ContextProvider = (props: any) => {
         };
       })
     );
-
     setCandidates(InitializedCandidates);
     console.log("Candidates are initialized.");
     setCandidatesAreInit(true);
@@ -319,6 +351,7 @@ export const ContextProvider = (props: any) => {
         currentStep,
         candidates,
         gmail,
+        isAdmin,
         setStep,
         signInGoogle,
         signOutGoogle,

@@ -97,7 +97,7 @@ export const ContextProvider = (props: any) => {
     }
   };
 
-  const revealResult = async () => {
+  const finalizeVoting = async () => {
     if (!tezos) {
       console.error("Tezos toolkit is not initialized.");
       alert("Please connect your wallet before voting.");
@@ -187,6 +187,10 @@ export const ContextProvider = (props: any) => {
     }
   }, [isInitLoading, init]);
 
+  useEffect(() => {
+    setIsAdmin(address? ADMIN_WALLET.includes(address) : false);
+  }, [address]);
+
   const updateMessage = (message: string) => setMessage(message);
 
   const setAccount = async () => {
@@ -194,9 +198,6 @@ export const ContextProvider = (props: any) => {
       tezos !== null ? await wallet?.client.getActiveAccount() : undefined
     );
     setAddress((await wallet?.client.getActiveAccount())?.address);
-    if (address) {
-      setIsAdmin(ADMIN_WALLET.includes(address));
-    }
   };
 
   const setStep = (step: VotingStep) => {
@@ -362,6 +363,7 @@ export const ContextProvider = (props: any) => {
         disconnect,
         handleVote,
         updateVote,
+        finalizeVoting
       }}
     >
       {props.children}

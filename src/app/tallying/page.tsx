@@ -10,12 +10,13 @@ import { AmountResponse } from "@/interfaces/context.interface";
 import { get } from "http";
 
 export default function Tallying() {
-  const { candidates, initCandidates } = useContext(Context);
+  const { candidates, initCandidates, isAdmin, finalizeVoting } = useContext(Context);
   const [isLoading, setIsLoading] = useState(true);
   // each candidate's numbers of votes ( 得票數 )
   const [voteCount, setVoteCount] = useState<AmountResponse>({});
   // total numbers of voters
   const [totalAmounts, setTotalAmounts] = useState<number|undefined>(undefined);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     if (!candidates || candidates.length <= 0) initCandidates();
@@ -35,7 +36,14 @@ export default function Tallying() {
     }
   }, [totalAmounts]);
 
-  if (isLoading) {
+  if (!isAdmin) {
+    return (
+      <div className="my-8 text-main font-bold text-center">
+        Unauthorized. Please connect to an admin wallet.
+      </div>
+    );
+  }
+  else if (isLoading) {
     return (
       <div className="my-8 text-main font-bold text-center">Loading...</div>
     );
@@ -58,19 +66,36 @@ export default function Tallying() {
           />
         ))}
       </div>
-      <div className="flex justify-center">
+      {isProcessing && <div className="text-center text-main">Processing...</div>}
+      {!isProcessing && 
+      <div className="flex justify-center gap-4">
         <Button
-          disabled={false}
+          disabled={isProcessing}
           type="secondary"
           onClick={() => {
+            setIsProcessing(true);
             getVoteCount().then((res) => {
               setVoteCount(res);
+              setIsProcessing(false);
             });
           }}
         >
-          Reveal
+          Reveal Current Votes
         </Button>
-      </div>
+        <Button
+          disabled={isProcessing}
+          type="secondary"
+          onClick={() => {
+            setIsProcessing(true);
+            finalizeVoting().then(() => {
+              alert("Voting stage has been finalized.");
+              setIsProcessing(false);
+            });
+          }}
+        >
+          Finalize Voting Stage
+        </Button>
+      </div>}
     </div>
   );
 }

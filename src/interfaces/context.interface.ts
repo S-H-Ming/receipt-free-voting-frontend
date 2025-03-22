@@ -91,6 +91,7 @@ export interface ContextState {
   disconnect: () => Promise<void>;
   handleVote: () => Promise<void>;
   updateVote: (id: number, checked: boolean) => void;
+  finalizeVoting: () => Promise<void>;
   /**
    *
    * @param tokenList Gacha token list in a round. Each token will be an object consisting of fa2, id and amount.

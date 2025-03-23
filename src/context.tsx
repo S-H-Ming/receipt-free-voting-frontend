@@ -71,6 +71,7 @@ export const ContextProvider = (props: any) => {
           );
           const contract = await tezos.wallet.at(candidate.address!);
           const vchoice = candidate.checked !== commitment.commitment;
+          console.log("Voting for candidate: ", candidate.name, candidate.checked);
           const transferParams = contract.methodsObject
             .vote({
               ballot_sig: commitment.ballot_signature[vchoice ? 1 : 0],
@@ -130,14 +131,14 @@ export const ContextProvider = (props: any) => {
     }
     catch (error) {
       console.error("Error while revealing results:", error);
-      alert("Revealing results failed. Please try again.");
+      throw error;
     }
   }
 
   const updateVote = (id: number, checked: boolean) => {
     setCandidates((prev) =>
       prev.map((candidate) =>
-        candidate.id === id ? { ...candidate, selected: checked } : candidate
+      candidate.id === id ? { ...candidate, checked: checked } : candidate
       )
     );
   };

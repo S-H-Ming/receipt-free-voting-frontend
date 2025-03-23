@@ -69,6 +69,17 @@ export interface RegisterResponse {
   sign_ballot: [string, string][];
 }
 
+export interface InitParams {
+  address: string;
+  r: number;
+  y: bigint;
+  n: bigint;
+  va_n: bigint;
+  va_v: number;
+  rsa_n: bigint;
+  rsa_v: number;
+}
+
 export interface ContextState {
   isInitLoading: boolean;
   gateways: { [key: string]: string };

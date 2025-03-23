@@ -3,14 +3,14 @@
 import { CandidateCard } from "@/components/voting";
 import { Context } from "@/context";
 import { useContext, useEffect, useState } from "react";
-import { getTotalAmount } from "@/libs/contracts_apis";
+import { getTotalAmount, initAllCandidates } from "@/libs/contract_apis";
 import { getVoteCount } from "@/libs/backend_apis";
 import Button from "@/components/button";
 import { AmountResponse } from "@/interfaces/context.interface";
 import { get } from "http";
 
 export default function Tallying() {
-  const { candidates, initCandidates, isAdmin, finalizeVoting } = useContext(Context);
+  const { tezos, candidates, isAdmin, initCandidates, finalizeVoting } = useContext(Context);
   const [isLoading, setIsLoading] = useState(true);
   // each candidate's numbers of votes ( 得票數 )
   const [voteCount, setVoteCount] = useState<AmountResponse>({});
@@ -77,10 +77,13 @@ export default function Tallying() {
             getVoteCount().then((res) => {
               setVoteCount(res);
               setIsProcessing(false);
+            }).catch((error) => {
+              alert(`Error while revealing: ${error}`);
+              setIsProcessing(false);
             });
           }}
         >
-          Reveal Current Votes
+          Reveal
         </Button>
         <Button
           disabled={isProcessing}
@@ -90,10 +93,34 @@ export default function Tallying() {
             finalizeVoting().then(() => {
               alert("Voting stage has been finalized.");
               setIsProcessing(false);
+            }).catch((error) => {
+              alert(`Error: ${error}`);
+              setIsProcessing(false);
             });
           }}
         >
-          Finalize Voting Stage
+          Finalize
+        </Button>
+        <Button
+          disabled={isProcessing}
+          type="secondary"
+          onClick={() => {
+            setIsProcessing(true);
+            if (!tezos) {
+              alert("Please connect your wallet first.");
+              setIsProcessing(false);
+              return;
+            }
+            initAllCandidates(tezos).then(() => {
+              alert(`Success Initialization!`);
+              setIsProcessing(false);
+            }).catch((error) => {
+              alert(`Error: ${error}`);
+              setIsProcessing(false);
+            });
+          }}
+        >
+          Initialize
         </Button>
       </div>}
     </div>

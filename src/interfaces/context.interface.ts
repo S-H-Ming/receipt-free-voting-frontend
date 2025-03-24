@@ -11,14 +11,6 @@ export enum VotingStep {
   TALLY_COMPLETED = "tally_completed",
 }
 
-export interface ResultResponse {
-  result: "yes" | "no";
-}
-
-export interface EncryptedResultResponse {
-  eresult: number;
-}
-
 export interface Candidate {
   id: number;
   imageURL: string;
@@ -29,9 +21,10 @@ export interface Candidate {
   mask_inv?: bigint;
   ballot: [bigint, bigint];
   enc_pairs: [bigint, bigint][];
-  ia_ballot_sig?: [bigint, bigint];
-  va_ballot_sig?: [bigint, bigint];
-  commitment_bit?: boolean;
+  amount?: number;
+  // ia_ballot_sig?: [bigint, bigint];
+  // va_ballot_sig?: [bigint, bigint];
+  // commitment_bit?: boolean;
 }
 
 export interface CommitmentReponse {
@@ -52,6 +45,14 @@ export interface EncryptedPairs {
   [key: string]: [bigint, bigint][];
 }
 
+export interface ResultResponse {
+  [key: string]: [number, bigint];
+}
+
+export interface AmountResponse {
+  [key: number]: number;
+}
+
 // export interface Ballot {
 //   b1: bigint;
 //   b2: bigint;
@@ -68,6 +69,17 @@ export interface RegisterResponse {
   sign_ballot: [string, string][];
 }
 
+export interface InitParams {
+  address: string;
+  r: number;
+  y: bigint;
+  n: bigint;
+  va_n: bigint;
+  va_v: number;
+  rsa_n: bigint;
+  rsa_v: number;
+}
+
 export interface ContextState {
   isInitLoading: boolean;
   gateways: { [key: string]: string };
@@ -79,6 +91,7 @@ export interface ContextState {
   currentStep: VotingStep;
   candidates: Candidate[];
   gmail: string | undefined;
+  isAdmin: boolean;
   setStep: (step: ContextState["currentStep"]) => void;
   signInGoogle: (callbackUrl?: string) => Promise<boolean>;
   signOutGoogle: () => Promise<void>;
@@ -89,6 +102,7 @@ export interface ContextState {
   disconnect: () => Promise<void>;
   handleVote: () => Promise<void>;
   updateVote: (id: number, checked: boolean) => void;
+  finalizeVoting: () => Promise<void>;
   /**
    *
    * @param tokenList Gacha token list in a round. Each token will be an object consisting of fa2, id and amount.
